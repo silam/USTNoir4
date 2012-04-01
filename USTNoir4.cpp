@@ -125,10 +125,13 @@ GLuint wheelside2vao[1];
 GLuint wheelside2vbo[2];
 
 // WHEEEL
+
+GLuint vWheelSide1AmbientDiffuseColor;
 GLuint vWheelSide1AmbientColor;
 GLuint vWheelSide1DiffuseColor; //Ambient and Diffuse can be the same for the material
 GLuint vWheelSide1SpecularColor;
 GLuint vWheelSide1Shininess;
+GLuint vWheelSide1SpecularExponent;
 
 // wheel2
 GLuint vWheelSide2AmbientColor;
@@ -716,9 +719,9 @@ void displayWheels()
     
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
-	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(0.5f, 0.5f, 0.0f, 1));
-	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
-	glVertexAttrib1f(vCarSpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
 
 	
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
@@ -743,9 +746,9 @@ void displayWheels()
 	mv = mv * RotateY(rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 
-	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(0.5f, 0.5f, 0.0f, 1));
-	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
-	glVertexAttrib1f(vCarSpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
 
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 
@@ -767,6 +770,10 @@ void displayWheels()
 	mv = mv * RotateY(-rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 	
 	mv = stack.pop();
@@ -786,6 +793,10 @@ void displayWheels()
 	mv = mv * RotateY(rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 		
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 		 
 
@@ -922,6 +933,11 @@ void setupCarShader(GLuint prog)
 }
 void setupWheelShader(GLuint prog)
 {
+	vWheelSide1AmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	
+	vWheelSide1SpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vWheelSide1SpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
 	// Create a vertex array object
     glGenVertexArrays( 1, &wheelside1vao[0] );
 	glBindVertexArray( wheelside1vao[0] );
