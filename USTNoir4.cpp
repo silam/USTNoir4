@@ -56,6 +56,12 @@ GLfloat rx, ry, rz;
 vec4 rightlampSource;
 vec3 rightlampDest;
 
+vec4 policeredlightlampSource;
+vec3 policeredlightlampDest;
+
+vec4 policebluelightlampSource;
+vec3 policebluelightlampDest;
+
 //////////////////////////////////////////////////
 // // turn the wheel left/right angle
 //////////////////////////////////////////////////
@@ -188,6 +194,27 @@ GLuint headambient_light;
 GLuint headspot_cutoff;
 GLuint headspot_exponent;
 GLuint headspot_direction;
+
+
+GLuint policeredlight_position;
+GLuint policeredlight_color;
+GLuint policereddiffuse_color;
+GLuint policeredspecular_color;
+GLuint policeredambient_light;
+GLuint policeredspot_cutoff;
+GLuint policeredspot_exponent;
+GLuint policeredspot_direction;
+
+GLuint policebluelight_position;
+GLuint policebluelight_color;
+GLuint policebluediffuse_color;
+GLuint policebluespecular_color;
+GLuint policeblueambient_light;
+GLuint policebluespot_cutoff;
+GLuint policebluespot_exponent;
+GLuint policebluespot_direction;
+
+
 
 struct lightSource
 {
@@ -620,29 +647,52 @@ void generatePoliceLamp()
 	
 
 }
-void setupPoliceLights()
+
+
+void setupPoliceLight()
 {
 	//stack.push(mv);
 
 		/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);
 		mv = mv * RotateY(turnCarAngle);*/
 
-		glUniform4fv(headlight_position, 1, mv*rightlampSource); //1));
-		glUniform4fv(headspot_direction, 1, mv*rightlampDest);//vec4(0, -10, 0));
+		glUniform4fv(policeredlight_position, 1, mv*policeredlightlampSource); 
+		glUniform4fv(policeredspot_direction, 1, mv*policeredlightlampDest);
 
 	//mv = stack.pop();
 
-	glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
-	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
-	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
-	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+	glUniform4fv(policeredlight_color,    1, vec4(1.0f,.0f,.0f,1));
+	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f,.0f,.0f,1));
+	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,.0f,.0f,1));
+	glUniform4fv(policeredambient_light,  1, vec4(.2, .2, .2, 1));
 
 	
-	glUniform1f(headspot_cutoff, 30);
-	glUniform1f(headspot_exponent, 10);
+	glUniform1f(policeredspot_cutoff, 1);
+	glUniform1f(policeredspot_exponent, 100);
 
+
+
+	//stack.push(mv);
+
+		/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);
+		mv = mv * RotateY(turnCarAngle);*/
+
+		glUniform4fv(policebluelight_position, 1, mv*policebluelightlampSource); 
+		glUniform4fv(policebluespot_direction, 1, mv*policebluelightlampDest);
+
+	//mv = stack.pop();
+
+	glUniform4fv(policebluelight_color, 1, vec4(0.0f,.0f,1.0f,1));
+	glUniform4fv(policebluediffuse_color, 1, vec4(0.0f,.0f,1.0f,1));
+	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,.0f,1.0f,1));
+	glUniform4fv(policeblueambient_light, 1, vec4(.2, .2, .2, 1));
+
+	
+	glUniform1f(policebluespot_cutoff, 45);
+	glUniform1f(policebluespot_exponent, 10);
 
 }
+
 void setupHeadLight()
 {
 	
@@ -970,6 +1020,8 @@ void display(void)
 	
 	setupMoonLight();
 	setupHeadLight();
+	setupPoliceLight();
+	
 
 	if(mode == 0){
 		//glBindVertexArray( vao[0] );
@@ -1037,6 +1089,19 @@ void setupShader(GLuint prog){
 	headspot_cutoff = glGetUniformLocation(prog, "lights[1].spot_cutoff");
 	headspot_exponent = glGetUniformLocation(prog, "lights[1].spot_exponent");
  
+	///////////////////////////////////////////////////
+	// setup police light
+	//////////////////////////////////////////////////
+	policeredlight_position = glGetUniformLocation(prog, "lights[2].position");
+	policereddiffuse_color = glGetUniformLocation(prog, "lights[2].diffuse");
+	policeredspecular_color = glGetUniformLocation(prog, "lights[2].specular");
+	policeredambient_light = glGetUniformLocation(prog, "ambient_light");
+
+	policeredspot_direction = glGetUniformLocation(prog, "lights[2].spot_direction");
+	policeredspot_cutoff = glGetUniformLocation(prog, "lights[2].spot_cutoff");
+	policeredspot_exponent = glGetUniformLocation(prog, "lights[2].spot_exponent");
+ 
+
 
 	glBindVertexArray( vao[0] );
 
@@ -1592,6 +1657,10 @@ void init() {
 
   rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
   rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+
+  
+	policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
+	policeredlightlampDest   = vec3(0.015, -0.905, -1);
 
   turnCarAngle = 0;
   turnAngle = 0;
