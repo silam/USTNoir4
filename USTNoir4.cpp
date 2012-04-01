@@ -43,6 +43,9 @@ double z_distance;
 GLfloat tx, ty, tz;
 GLfloat rx, ry, rz;
 
+vec4 rightlampSource;
+vec3 rightlampDest;
+
 //////////////////////////////////////////////////
 // // turn the wheel left/right angle
 //////////////////////////////////////////////////
@@ -92,6 +95,16 @@ GLuint vNormal;
 GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
 GLuint vSpecularExponent;
+
+GLuint vStageAmbientDiffuseColor;
+GLuint vStageSpecularColor;
+GLuint vStageSpecularExponent;
+
+
+GLuint vCarAmbientDiffuseColor;
+GLuint vCarSpecularColor;
+GLuint vCarSpecularExponent;
+
 
 GLuint moonlight_position;
 GLuint moonlight_color;
@@ -406,22 +419,21 @@ int generateSphere(float radius, int subdiv){
 
 void setupHeadLight()
 {
-	vec4 rightlampSource = vec4(currentX,-0.90,currentZ + 0.05,1); 
-	vec3 rightlampDest   = vec3(currentX,-0.99,currentZ + 0.05); 
+	
 
-	stack.push(mv);
+	//stack.push(mv);
 
-		//mv = mv * Translate(currentX, 0, currentZ);
-		//mv = mv * RotateY(turnCarAngle);
+		/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);
+		mv = mv * RotateY(turnCarAngle);*/
 
 		glUniform4fv(headlight_position, 1, mv*rightlampSource); //1));
 		glUniform4fv(headspot_direction, 1, mv*rightlampDest);//vec4(0, -10, 0));
 
-	mv = stack.pop();
+	//mv = stack.pop();
 
 	glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
-	glUniform4fv(headspecular_color, 1, vec4(0.8,.8f,.4f,1));
+	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
 
 	
@@ -461,9 +473,9 @@ void displayStage(void)
 		//mv = mv * Translate(0, 10,0);
 		//mv = mv * RotateX(90);
 
-	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0.5, 0.5, 1));
-	glVertexAttrib4fv(vSpecularColor, vec4(0.5f,0.5f,1.0f,1.0f));
-	glVertexAttrib1f(vSpecularExponent, 10.0);
+	glVertexAttrib4fv(vStageAmbientDiffuseColor, vec4(.5, 0.5, 0.5, 1));
+	glVertexAttrib4fv(vStageSpecularColor, vec4(0.5f,0.5f,1.0f,1.0f));
+	glVertexAttrib1f(vStageSpecularExponent, 10.0);
 
 	glBindVertexArray( stagevao[0] );
 	glDrawArrays( GL_TRIANGLES, 0, 6 );    // draw the sphere 
@@ -475,11 +487,11 @@ void moveHeadLight()
 	//stack.push(mv);
 		
 	
-	vec4 rightlampSource = vec4(currentX,-0.93,currentZ,1); 
+	/*vec4 rightlampSource = vec4(currentX,-0.93,currentZ,1); 
 	vec3 rightlampDest   = vec3(currentX,-0.99,currentZ + 0.05); 
 	
 	glUniform4fv(headlight_position, 1, mv*rightlampSource); 
-	glUniform4fv(headspot_direction, 1, mv*rightlampDest);
+	glUniform4fv(headspot_direction, 1, mv*rightlampDest);*/
 	
 	//mv = stack.pop();
 }
@@ -488,9 +500,8 @@ void moveHeadLight()
 /////////////////////////////////////////
 void displayCar(void)
 {
+	
 	stack.push(mv);
-	
-	
 	
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
@@ -501,9 +512,9 @@ void displayCar(void)
 	
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
-	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0.5, 0.5, 1));
-	glVertexAttrib4fv(vSpecularColor, vec4(0.5f,0.5f,1.0f,1.0f));
-	glVertexAttrib1f(vSpecularExponent, 10.0);
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 1.0f,0.0f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 10.0);
 
 
 	DrawTriagle(carvao, 36);
@@ -577,9 +588,9 @@ void setupShader(GLuint prog){
 	model_view = glGetUniformLocation(prog, "model_view");
 	projection = glGetUniformLocation(prog, "projection");
 	
-	vAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
 
 	// setup moonlight
@@ -614,6 +625,10 @@ void setupShader(GLuint prog){
 
 void setupCarShader(GLuint prog)
 {
+	vCarAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vCarSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vCarSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
 		// Create a vertex array object
     glGenVertexArrays( 1, &carvao[0] );
 	glBindVertexArray( carvao[0] );
@@ -716,6 +731,15 @@ void myIdle()
 			currentX = currentX + moveStepX;
 			currentZ = currentZ + moveStepZ;
 
+			rightlampSource.x = rightlampSource.x + moveStepX;
+			rightlampSource.z = rightlampSource.z + moveStepZ;
+
+			rightlampDest.x = rightlampDest.x + moveStepX;
+			rightlampDest.z = rightlampDest.z + moveStepZ;
+
+			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
+			rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+
 			if ( currentX < -1.0 )
 			{
 				currentX = -1.00f;
@@ -755,6 +779,15 @@ void myIdle()
 
 			currentX = currentX - moveStepX;
 			currentZ = currentZ - moveStepZ;
+
+			rightlampSource.x = rightlampSource.x - moveStepX;
+			rightlampSource.z = rightlampSource.z - moveStepZ;
+
+			rightlampDest.x = rightlampDest.x - moveStepX;
+			rightlampDest.z = rightlampDest.z - moveStepZ;
+
+			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
+			rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
 
 			if ( currentX < -1.0 )
 			{
@@ -1012,6 +1045,14 @@ void init() {
   bmoveForward = true;
   moveStepZ = 0.0005;
   currentX = currentZ = 0;
+
+  rightlampDest.x = rightlampSource.x = -0.02;
+  rightlampSource.z = 0.1;
+  rightlampDest.z = 0.2;
+
+  rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
+  rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+
   turnCarAngle = 0;
   turnAngle = 0;
   rollangle = 0;
