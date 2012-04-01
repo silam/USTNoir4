@@ -9,6 +9,9 @@
 #include "./matrix_stack.h"
 #pragma comment(lib, "glew32.lib")
 
+typedef Angel::vec4  color4;
+typedef Angel::vec4  point4;
+
 //store window width and height
 //store window width and height
 int ww=1500, wh=1100;
@@ -91,6 +94,53 @@ GLuint projection;
 GLuint vPosition;
 GLuint vNormal;
 
+
+/////////////////////////
+// wheel cylinder
+/////////////////////////
+vec4 wheelCylinderVers[414];
+vec4 vWheelCylinderNormals[414];
+
+vec4 wheelCylinderColors[500];
+
+GLuint cylindervao[1];
+GLuint cylindervbo[2];
+
+/////////////////////////
+// wheel side vertices
+/////////////////////////
+vec4 wheelSide1Verts[75];
+vec4 wheelSide1Normals[75];
+
+vec4 wheelSide2Verts[75];
+vec4 wheelSide2Normals[75];
+
+vec4 wheelside1Colors[75];
+vec4 wheelside2Colors[75];
+
+GLuint wheelside1vao[1];
+GLuint wheelside1vbo[2];
+
+GLuint wheelside2vao[1];
+GLuint wheelside2vbo[2];
+
+// WHEEEL
+GLuint vWheelSide1AmbientColor;
+GLuint vWheelSide1DiffuseColor; //Ambient and Diffuse can be the same for the material
+GLuint vWheelSide1SpecularColor;
+GLuint vWheelSide1Shininess;
+
+// wheel2
+GLuint vWheelSide2AmbientColor;
+GLuint vWheelSide2DiffuseColor; //Ambient and Diffuse can be the same for the material
+GLuint vWheelSide2SpecularColor;
+GLuint vWheelSide2Shininess;
+
+// cylinder
+GLuint vWheelCylinderAmbientColor; //Ambient and Diffuse can be the same for the material
+GLuint vWheelCylinderDiffuseColor; //Ambient and Diffuse can be the same for the material
+GLuint vWheelCylinderSpecularColor;
+GLuint vWheelCylinderShininess;
 
 GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
@@ -356,6 +406,90 @@ void generateCar(){
 	carNormals[index++] = normal;
 	
 }
+
+/////////////////////////////////////////
+// generateWheelSides
+/////////////////////////////////////////
+void generateWheelSides()
+{
+	int side = 1; // the outer side of the wheel
+	
+	int point = 0;
+	double angleincrement = 15;
+	for ( double angle = 0; angle <= 360; angle += angleincrement)
+	{
+		//wheelside1Colors[point] = vec4(1.0f, 1.0f, 1.0f, 1.0);
+		point4 a = wheelSide1Verts[point++] = vec4(0.0f,side*(-1.0f), 0.0f, 1.0); //point 1
+		
+		//wheelside1Colors[point] = vec4(cos(angle*M_PI/180), -1.0f, -sin(angle*M_PI/180), 1.0); //point 2
+		point4 b = wheelSide1Verts[point++] = vec4(cos(angle*M_PI/180), side*(-1.0f), -sin(angle*M_PI/180), 1.0); //point 2
+		
+		//wheelside1Colors[point] = vec4(cos((angle+angleincrement)*M_PI/180), -1.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+		point4 c = wheelSide1Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+		
+		vec3 normal = normalize(cross(c-b, a -b));
+
+		wheelSide1Normals[point-3] = normal;
+		wheelSide1Normals[point-2] = normal;
+		wheelSide1Normals[point-1] = normal;
+
+	}
+
+	side = -1; // the inner side of the wheel
+	point = 0;
+	angleincrement = 15;
+	for ( double angle = 0; angle <= 360; angle += angleincrement)
+	{
+		point4 a = wheelSide2Verts[point++] = vec4(0.0f,		side*(-1.0f), 0.0f, 1.0); 
+		
+
+		point4 b = wheelSide2Verts[point++] = vec4(cos(angle*M_PI/180), side*(-1.0f), -sin(angle*M_PI/180), 1.0); 
+		wheelside2Colors[point] = vec4(0.5f,0.5f,0.5f, 1.0); 
+
+		point4 c = wheelSide2Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+		wheelside2Colors[point] = vec4(0.5f ,0.5f,0.5f, 1.0); 
+
+		vec3 normal = normalize(cross(c-b, a -b));
+
+		wheelSide2Normals[point-3] = normal;
+		wheelSide2Normals[point-2] = normal;
+		wheelSide2Normals[point-1] = normal;
+	}
+
+
+	//
+	// cylinder of the wheel
+	int p = 0;
+	for ( int i = 0; i < 410 ; i += 6)
+	{
+	
+		point4 a = wheelCylinderVers[i] =   wheelSide1Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
+		point4 b = wheelCylinderVers[i+1] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
+		point4 c = wheelCylinderVers[i+2] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
+
+		vec3 normal = normalize(cross(c - b, a - b));
+		vWheelCylinderNormals[i] = normal;
+		vWheelCylinderNormals[i+1] = normal;
+		vWheelCylinderNormals[i+2] = normal;
+
+		a = wheelCylinderVers[i+3] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
+		b = wheelCylinderVers[i+4] = wheelSide2Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
+		c = wheelCylinderVers[i+5] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
+		normal = normalize(cross(c - b, a - b));
+		vWheelCylinderNormals[i+3] = normal;
+		vWheelCylinderNormals[i+4] = normal;
+		vWheelCylinderNormals[i+5] = normal;
+
+
+		p++;
+
+	}
+
+
+	
+
+	
+}
 /////////////////////////////////////////
 // DrawTriagle
 /////////////////////////////////////////
@@ -522,7 +656,143 @@ void displayCar(void)
 	mv = stack.pop();
    
 }
+/////////////////////////////////////////
+// DrawWheels
+/////////////////////////////////////////
+void DrawWheels(GLuint wheelside1vao[1],
+				  GLuint wheelside2vao[2],
+				  GLuint cylindervao[1], 
+				  GLsizei sidecount, GLsizei cylindercount)
+{
+	
+	
+	/*glUniform4fv(vWheelSide1AmbientColor,1, wheelside.ambient);
+	glUniform4fv(vWheelSide1DiffuseColor,1, wheelside.diffuse);
+	glUniform4fv(vWheelSide1SpecularColor,1, wheelside.specular);
+	glUniform1i(vWheelSide1Shininess, wheelside.shininess);*/
 
+	DrawTriagle(wheelside1vao, sidecount);
+
+	/*glUniform4fv(vWheelSide2AmbientColor,1, wheelside.ambient);
+	glUniform4fv(vWheelSide2DiffuseColor,1, wheelside.diffuse);
+	glUniform4fv(vWheelSide2SpecularColor,1, wheelside.specular);
+	glUniform1i(vWheelSide2Shininess, wheelside.shininess);*/
+
+	DrawTriagle(wheelside2vao, sidecount);
+	
+	
+	// draw cylinder
+
+	/*glUniform4fv(vWheelCylinderAmbientColor,1, cylinder.ambient);
+	glUniform4fv(vWheelCylinderDiffuseColor,1, cylinder.diffuse);
+	glUniform4fv(vWheelCylinderSpecularColor,1, cylinder.specular);
+	glUniform1i(vWheelCylinderShininess, cylinder.shininess);
+*/
+	
+	DrawTriagle(cylindervao, cylindercount);
+
+}
+/////////////////////////////////////////
+// displayWheels
+/////////////////////////////////////////
+void displayWheels()
+{
+
+	/////////////////////
+	// First wheel : driver wheel
+	////////////////////
+	stack.push(mv);
+
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+		
+		
+	mv = mv * Translate(0.04, -0.97f, 0.0405); //0.065); // 0.04);
+	mv = mv * RotateZ(90);
+	mv = mv * RotateX(turnAngle);
+    mv = mv * RotateY(-rollangle);
+	mv = mv * Scale(0.025,0.007,0.025);
+
+    
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(0.5f, 0.5f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 10.0);
+
+	
+	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
+
+	
+	mv = stack.pop();
+
+
+	/////////////////////////////////
+	// seconf wheel: passenger wheel
+	/////////////////////////////////
+	stack.push(mv);
+
+
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	
+	
+	mv = mv * Translate(-0.04, -0.97f, 0.0405);
+	mv = mv * RotateZ(-90);
+	mv = mv * RotateX(-turnAngle);
+	mv = mv * RotateY(rollangle);
+	mv = mv * Scale(0.025,0.007,0.025);
+
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(0.5f, 0.5f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 10.0);
+
+	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
+
+	mv = stack.pop();
+
+	/////////////////////////////////
+	// third wheel
+	/////////////////////////////////
+	stack.push(mv);
+	
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	
+		
+	mv = mv * Translate(0.04, -0.97f, -0.0595); //-0.06 + 0.0005);
+	mv = mv * RotateZ(90);
+	
+	mv = mv * RotateY(-rollangle);
+	mv = mv * Scale(0.025,0.007,0.025);
+
+	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
+	
+	mv = stack.pop();
+
+	/////////////////////////////////
+	// fourth wheel
+	/////////////////////////////////
+	stack.push(mv);
+		
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	
+	
+	mv = mv * Translate(-0.04, -0.97f, -0.0595);
+	mv = mv * RotateZ(-90);
+	
+	mv = mv * RotateY(rollangle);
+	mv = mv * Scale(0.025,0.007,0.025);
+		
+	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
+		 
+
+	mv = stack.pop();
+
+
+}
 void display(void)
 {
   /*clear all pixels*/
@@ -553,7 +823,7 @@ void display(void)
 		displayStage();
 		moveHeadLight();
 		displayCar();
-
+		displayWheels();
 		
 
 	}else{
@@ -650,13 +920,82 @@ void setupCarShader(GLuint prog)
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+void setupWheelShader(GLuint prog)
+{
+	// Create a vertex array object
+    glGenVertexArrays( 1, &wheelside1vao[0] );
+	glBindVertexArray( wheelside1vao[0] );
 
+	glGenBuffers( 2, &wheelside1vbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec4), wheelSide1Verts, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec3), wheelSide1Normals, GL_STATIC_DRAW );
+
+	glBindVertexArray( wheelside1vao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	// wheelside 2
+	glGenVertexArrays( 1, &wheelside2vao[0] );
+	glBindVertexArray( wheelside2vao[0] );
+
+	glGenBuffers( 2, &wheelside2vbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec4), wheelSide2Verts, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec3), wheelSide2Normals, GL_STATIC_DRAW );
+
+	glBindVertexArray( wheelside2vao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	// cylinder
+	glGenVertexArrays( 1, &cylindervao[0] );
+	glBindVertexArray( cylindervao[0] );
+
+	glGenBuffers( 2, &cylindervbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, 414*sizeof(vec4), wheelCylinderVers, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, 414*sizeof(vec3), vWheelCylinderNormals, GL_STATIC_DRAW );
+
+	glBindVertexArray( cylindervao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+}
 void setupStageShader(GLuint prog)
 {
 	
 	// Create a vertex array object
     glGenVertexArrays( 1, &stagevao[0] );
 	glBindVertexArray( stagevao[0] );
+	
 	glGenBuffers( 2, &stagevbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, stagevbo[0] );
 	glBufferData( GL_ARRAY_BUFFER, 6*sizeof(vec4), stageVerts, GL_STATIC_DRAW);
@@ -1065,6 +1404,7 @@ void init() {
   spherevertcount = generateSphere(2, 30);
     generateStage();
 	generateCar();
+	generateWheelSides();
 
    // Load shaders and use the resulting shader program
     program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
@@ -1075,6 +1415,7 @@ void init() {
 	setupShader(program2);
 	setupStageShader(program2);
 	setupCarShader(program2);
+	setupWheelShader(program2);
 
   //Only draw the things in the front layer
 	glEnable(GL_DEPTH_TEST);
