@@ -23,6 +23,13 @@ matrix_stack stack;
 #define M_PI 3.14159265358979323846
 
 GLuint program1, program2, program3;
+
+GLuint policeredvao[1];
+GLuint policeredvbo[2];
+GLuint policebluevao[1];
+GLuint policebluevbo[2];
+GLfloat turnPoliceLampAngle;
+
 GLuint carvao[1];
 GLuint carvbo[2];
 GLuint stagevao[1];
@@ -149,6 +156,10 @@ GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
 GLuint vSpecularExponent;
 
+GLuint vPoliceRedAmbientDiffuseColor;
+GLuint vPoliceRedSpecularColor;
+GLuint vPoliceRedSpecularExponent;
+
 GLuint vStageAmbientDiffuseColor;
 GLuint vStageSpecularColor;
 GLuint vStageSpecularExponent;
@@ -202,6 +213,11 @@ struct material
 
 vec4* sphere_verts;
 vec3* sphere_normals;
+
+vec4* policeLampRedVerts;
+vec3* policeLampRedNormals;
+vec4* policeLampBlueVerts;
+vec3* policeLampBlueNormals;
 
 vec4* stageVerts;
 vec3* stageNormals;
@@ -553,7 +569,80 @@ int generateSphere(float radius, int subdiv){
 	}
 	return totalverts;
 }
+/////////////////////////////////////////
+//generatePoliceLamp
+/////////////////////////////////////////
+void generatePoliceLamp()
+{
+		
+	policeLampRedVerts = new vec4[144];
+	policeLampRedNormals = new vec3[144];
 
+	policeLampBlueVerts = new vec4[144];
+	policeLampBlueNormals = new vec3[144];
+
+	int point = 0;
+	double angleincrement = 15;
+	for ( double angle = 0; angle <= 360; angle += angleincrement)
+	{
+		
+		point4 a = policeLampRedVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
+		
+		point4 b = policeLampRedVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
+				
+		point4 c = policeLampRedVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+		
+		vec3 normal = normalize(cross(c-b, a -b));
+
+		policeLampRedNormals[point-3] = normal;
+		policeLampRedNormals[point-2] = normal;
+		policeLampRedNormals[point-1] = normal;
+	}
+
+	
+	 point = 0;
+	 angleincrement = 15;
+
+	for ( double angle = 0; angle <= 360; angle += angleincrement)
+	{
+	
+		point4 a = policeLampBlueVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
+		point4 b = policeLampBlueVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
+		point4 c = policeLampBlueVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+		
+		vec3 normal = normalize(cross(c-b, a -b));
+
+		policeLampBlueNormals[point-3] = normal;
+		policeLampBlueNormals[point-2] = normal;
+		policeLampBlueNormals[point-1] = normal;
+	}
+
+	
+
+}
+void setupPoliceLights()
+{
+	//stack.push(mv);
+
+		/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);
+		mv = mv * RotateY(turnCarAngle);*/
+
+		glUniform4fv(headlight_position, 1, mv*rightlampSource); //1));
+		glUniform4fv(headspot_direction, 1, mv*rightlampDest);//vec4(0, -10, 0));
+
+	//mv = stack.pop();
+
+	glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
+	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
+	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
+	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+
+	
+	glUniform1f(headspot_cutoff, 30);
+	glUniform1f(headspot_exponent, 10);
+
+
+}
 void setupHeadLight()
 {
 	
@@ -804,6 +893,63 @@ void displayWheels()
 
 
 }
+void displayPoliceLamps()
+{
+	//////////////////////////////////////////
+	// police lamp
+	//////////////////////////////////////////
+	
+
+	// left lamp
+	stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+
+	//mv = mv * Translate(0, 0, 0.05);
+	
+	//mv = mv * Translate(0, 0.034, 0.015);
+	// mv = mv * RotateY(turnEyeAngle);
+	mv = mv * Translate(0.015, -0.905, 0.05); // -0.905
+	//mv = mv * Translate(0.006, -0.905, 0.07);
+	mv = mv * RotateY(turnPoliceLampAngle);
+	mv = mv * RotateX(-90);
+	mv = mv * Scale(0.010f,0.040f,0.040f);
+
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+
+	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1.0f, 0.0f, 0.0f, 1));
+	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
+	glVertexAttrib1f(vPoliceRedSpecularExponent, 10.0);
+
+
+	DrawTriagle(policeredvao, 144);
+
+	mv = stack.pop();
+
+	// Blue lamp
+	stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+
+	//mv = mv * Translate(0, 0, 0.05);
+	
+	//mv = mv * Translate(0, 0.034, 0.015);
+	// mv = mv * RotateY(turnEyeAngle);
+	mv = mv * Translate(-0.015, -0.905, 0.05); // -0.905
+	//mv = mv * Translate(0.006, -0.905, 0.07);
+	mv = mv * RotateY(turnPoliceLampAngle);
+	mv = mv * RotateX(-90);
+	mv = mv * Scale(0.010f,0.040f,0.040f);
+
+
+	DrawTriagle(policebluevao, 144);
+
+	mv = stack.pop();
+
+}
+
 void display(void)
 {
   /*clear all pixels*/
@@ -834,6 +980,7 @@ void display(void)
 		displayStage();
 		moveHeadLight();
 		displayCar();
+		displayPoliceLamps();
 		displayWheels();
 		
 
@@ -931,6 +1078,36 @@ void setupCarShader(GLuint prog)
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+
+void setupPoliceLightShader(GLuint prog)
+{
+	vPoliceRedAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vPoliceRedSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vPoliceRedSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
+		// Create a vertex array object
+    glGenVertexArrays( 1, &policeredvao[0] );
+	glBindVertexArray( policeredvao[0] );
+	glGenBuffers( 2, &policeredvbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec4), policeLampRedVerts, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, carvbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec3), policeLampRedNormals, GL_STATIC_DRAW );
+
+
+	glBindVertexArray( policeredvao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, carvbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+
 void setupWheelShader(GLuint prog)
 {
 	vWheelSide1AmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
@@ -1036,6 +1213,12 @@ void setupStageShader(GLuint prog)
 /////////////////////////////////////////
 void myIdle()
 {
+	if ( turnPoliceLampAngle > 360 )
+	{
+		turnPoliceLampAngle = 0;
+	}
+	
+	turnPoliceLampAngle += 1;
 
 	GLint moveF = 1;
 	if ( bmoveForward == true )
@@ -1379,6 +1562,8 @@ void init() {
   /*select clearing (background) color*/
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
+  
+    turnPoliceLampAngle = 0;
 
   //set up transformation defaults
   //start with no translation or rotation
@@ -1420,6 +1605,7 @@ void init() {
   spherevertcount = generateSphere(2, 30);
     generateStage();
 	generateCar();
+	generatePoliceLamp();
 	generateWheelSides();
 
    // Load shaders and use the resulting shader program
@@ -1431,6 +1617,7 @@ void init() {
 	setupShader(program2);
 	setupStageShader(program2);
 	setupCarShader(program2);
+	setupPoliceLightShader(program2);
 	setupWheelShader(program2);
 
   //Only draw the things in the front layer
