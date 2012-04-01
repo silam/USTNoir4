@@ -43,6 +43,34 @@ double z_distance;
 GLfloat tx, ty, tz;
 GLfloat rx, ry, rz;
 
+//////////////////////////////////////////////////
+// // turn the wheel left/right angle
+//////////////////////////////////////////////////
+GLfloat turnAngle;
+GLfloat turnCarAngle = 0;
+
+GLfloat maxTurnWheel = 45.00f;
+
+//////////////////////////////////////////////////
+// current position of the car
+//////////////////////////////////////////////////
+GLfloat currentX;
+GLfloat currentZ;
+/////////////////////////
+// move car
+/////////////////////////
+//GLfloat moveForward;
+GLfloat moveStepZ = 0.0005;
+GLfloat rollangle;
+GLfloat turnEyeAngle;
+
+GLfloat moveStepX, vectorLen;
+
+GLboolean  bmoveForward;
+
+GLint switchcamera;
+GLint turnEyeRight;
+
 //////////////////////////
 GLboolean  pointCameraAt;
 GLfloat lenszoom;
@@ -378,13 +406,25 @@ int generateSphere(float radius, int subdiv){
 
 void setupHeadLight()
 {
-	glUniform4fv(headlight_position, 1, mv*vec4(0, -0.9, 0, 1)); //1));
+	vec4 rightlampSource = vec4(currentX,-0.90,currentZ + 0.05,1); 
+	vec3 rightlampDest   = vec3(currentX,-0.99,currentZ + 0.05); 
+
+	stack.push(mv);
+
+		//mv = mv * Translate(currentX, 0, currentZ);
+		//mv = mv * RotateY(turnCarAngle);
+
+		glUniform4fv(headlight_position, 1, mv*rightlampSource); //1));
+		glUniform4fv(headspot_direction, 1, mv*rightlampDest);//vec4(0, -10, 0));
+
+	mv = stack.pop();
+
 	glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
 	glUniform4fv(headspecular_color, 1, vec4(0.8,.8f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
 
-	glUniform4fv(headspot_direction, 1, mv*vec4(0, -10, 0));
+	
 	glUniform1f(headspot_cutoff, 30);
 	glUniform1f(headspot_exponent, 10);
 
@@ -430,18 +470,32 @@ void displayStage(void)
    
 }
 
+void moveHeadLight()
+{
+	//stack.push(mv);
+		
+	
+	vec4 rightlampSource = vec4(currentX,-0.93,currentZ,1); 
+	vec3 rightlampDest   = vec3(currentX,-0.99,currentZ + 0.05); 
+	
+	glUniform4fv(headlight_position, 1, mv*rightlampSource); 
+	glUniform4fv(headspot_direction, 1, mv*rightlampDest);
+	
+	//mv = stack.pop();
+}
 /////////////////////////////////////////
 // displayCar
 /////////////////////////////////////////
 void displayCar(void)
 {
 	stack.push(mv);
-		
 	
-	//mv = mv * Translate(currentX, 0, currentZ);
-	//mv = mv * RotateY(turnCarAngle);
+	
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
 	 
-	mv = mv * Translate(0, -0.93, 0.0005); //0.025); // 0.05
+	mv = mv * Translate(0, -0.93, 0.0005); 
 	//mv = mv * Scale(1.0,0.5,3);
 	mv = mv * Scale(0.5,0.25,1.5 );
 	
@@ -451,11 +505,6 @@ void displayCar(void)
 	glVertexAttrib4fv(vSpecularColor, vec4(0.5f,0.5f,1.0f,1.0f));
 	glVertexAttrib1f(vSpecularExponent, 10.0);
 
-	/*glUniform4fv(vCarAmbientColor,1, car.ambient);
-	glUniform4fv(vCarDiffuseColor, 1, car.diffuse);
-	glUniform4fv(vCarSpecularColor, 1, car.specular);
-	glUniform1i(vCarShininess, car.shininess);
-*/
 
 	DrawTriagle(carvao, 36);
 
@@ -491,8 +540,10 @@ void display(void)
 
 
 		displayStage();
-		
+		moveHeadLight();
 		displayCar();
+
+		
 
 	}else{
 		glBindVertexArray(0);
@@ -610,23 +661,131 @@ void setupStageShader(GLuint prog)
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
+/////////////////////////////////////////
+// myIdle
+/////////////////////////////////////////
+void myIdle()
+{
+
+	GLint moveF = 1;
+	if ( bmoveForward == true )
+	{
+		moveF = 1;
+	}
+	else
+	{
+		moveF = -1;
+	}
+
+	
+
+	//chasecamlookdirection = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * chasecamlookdirection;
+	//viewpointcam = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * viewpointcam;
+
+		
+	if ( pointCameraAt == true ) // point the stage
+	{
+		atX = 0;
+		atZ = 0;
+	}
+	else // point at the car
+	{
+		atX = currentX;
+		atZ = currentZ;
+	}
+
+	if ( currentX > -1 && currentX < 1 &&
+		 currentZ > -1 && currentZ < 1 ) 
+	{
+		if ( bmoveForward == true )
+		{
+		
+			if ( turnAngle < 0)
+			{
+				turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;
+			}
+			else if ( turnAngle > 0)
+			{
+				turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;
+			}
+			
+	
+			moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
+			moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
+
+			currentX = currentX + moveStepX;
+			currentZ = currentZ + moveStepZ;
+
+			if ( currentX < -1.0 )
+			{
+				currentX = -1.00f;
+			}
+			else if ( currentX > 1.0 )
+			{
+				currentX = 1.00f;
+			}
+			else if ( currentZ > 1.0 )
+			{
+				currentZ = 1.00f;
+			}
+			else if ( currentZ < -1.0 )
+			{
+				currentZ = -1.00f;
+			}
+			else
+			{
+			
+			}
+
+			rollangle += (vectorLen * 360)/(0.05*M_PI);
+		}
+		else
+		{
+			if ( turnAngle < 0)
+			{
+				turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;;
+			}
+			else if ( turnAngle > 0)
+			{
+				turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;;
+			}
+		
+			moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
+			moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
+
+			currentX = currentX - moveStepX;
+			currentZ = currentZ - moveStepZ;
+
+			if ( currentX < -1.0 )
+			{
+				currentX = -1.00f;
+			}
+			else if ( currentX > 1.0 )
+			{
+				currentX = 1.00f;
+			}
+			else if ( currentZ > 1.0 )
+			{
+				currentZ = 1.00f;
+			}
+			else if ( currentZ < -1.0 )
+			{
+				currentZ = -1.00f;
+			}
+		
+
+			rollangle -= (vectorLen * 360)/(0.05*M_PI);
+		}
+
+		glutPostRedisplay();
+	}
+} 
 void Keyboard(unsigned char key, int x, int y) {
 	/*exit when the escape key is pressed*/
 	if (key == 27)
 		exit(0);
 
-	if (key == 'r' || key == 'R' )
-	{
-		 ///////////////////
-		  // assighment 3
-		  ///////////////////
-		  atX = atZ = 0;
-		  dollyzoom = 20.0f;
-		  lenszoom = 45.0;
-
-		  reshape(ww, wh);
-	}
-	else if (key == 'w' || key == 'W' ) // dolly in
+	if (key == 'w' || key == 'W' ) // dolly in
 	{
 		dollyzoom += 1;
 	}
@@ -652,6 +811,139 @@ void Keyboard(unsigned char key, int x, int y) {
 	if (key == 't'){
 		mode = 1;
 	}
+	if (key == 'r' || key == 'R' )
+	{
+		 ///////////////////
+		  // assighment 3
+		  ///////////////////
+		  atX = atZ = 0;
+		  dollyzoom = 20.0f;
+		  lenszoom = 45.0;
+
+		  reshape(ww, wh);
+	}
+	else if (key == 'c' || key == 'C' )
+	{
+		/*if ( switchcamera == 0 )
+		{
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			switchcamera = 1;
+		}
+		else if ( switchcamera == 1 )
+		{
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			switchcamera = 2;
+		}
+		else if ( switchcamera == 2 )
+		{
+			reshape(ww, wh);
+			switchcamera = 0;
+		}
+*/
+	}
+	else if (key == 'f' || key == 'F' ) // toggle b/t look at origin or current car postion
+	{
+		if ( pointCameraAt == true )
+		{
+			pointCameraAt = false;
+			
+		}
+		else
+		{
+			pointCameraAt = true;
+			
+		}
+	}
+	else if (key == 's' || key == 'S' ) // to zoom out
+	{
+
+
+		/*if ( switchcamera == 0)
+		{
+			lenszoom += 1;
+			reshape(ww, wh);
+		}
+		else
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);*/
+			
+	}
+	else if (key == 'a' || key == 'A' ) // to zoom in
+	{
+		
+		/*if ( switchcamera == 0)
+		{
+			lenszoom -= 1;
+			reshape(ww, wh);
+		}
+		else
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);*/
+	}
+	else if (key == 'w' || key == 'W' ) // dolly in
+	{
+		dollyzoom += 1;
+	}
+	else if (key == 'q' || key == 'Q' ) // to dolly out in
+	{
+		dollyzoom -= 1;
+	}
+	if ( key == 'b' || key == 'B' ) // to start the car
+	{
+		glutIdleFunc(myIdle);
+	}
+
+	if ( key == 32 ) // to stop car moving
+	{
+		glutIdleFunc(NULL);
+	}
+	else if(key == 'z')
+	{
+		//turnEyeRight = 1;
+		//turnEyeAngle += 1;
+	}
+	else if(key == 'x')
+	{
+		//turnEyeRight = -1;
+		//turnEyeAngle -= 1;
+	}
+	else if(key == 'i')
+	{
+		rx += 5;
+		if(rx > 360)
+			rx -= 360;
+	}
+	else if(key == 'j'){
+		rx -= 5;
+		if(rx < 0)
+			rx += 360;
+	}
+	else if(key == 'o'){
+		ry += 5;
+		if(ry > 360)
+			ry -= 360;
+	}
+	else if(key == 'k'){
+		ry -= 5;
+		if(ry < 0)
+			ry += 360;
+	}else if(key == 'p'){
+		rz += 5;
+		if(rz > 360)
+			rz -= 360;
+	}else if(key == 'l'){
+		rz -= 5;
+		if(rz < 0)
+			rz += 360;
+	}
+
+	printf("rx = %f\n", rx);
+	printf("ry = %f\n", ry);
+	printf("rz = %f\n", rz);
+
+
+	printf("tx = %f\n", tx);
+	printf("ty = %f\n", ty);
+	printf("tz = %f\n", tz);
+
 	reshape(ww,wh);
 	glutPostRedisplay();
 
@@ -693,6 +985,7 @@ void mouse(int button, int state, int x, int y) {
 	}
 }
 
+
 void init() {
 
   /*select clearing (background) color*/
@@ -709,6 +1002,23 @@ void init() {
    rx = 30;
   ty = 0.8;
   tz = 19.2;
+  // TRUE: point camear at the center, 
+  // False: point at the car
+  pointCameraAt = true;
+  switchcamera = 0; //
+  ///////////////////
+  // assighment 2
+  ///////////////////
+  bmoveForward = true;
+  moveStepZ = 0.0005;
+  currentX = currentZ = 0;
+  turnCarAngle = 0;
+  turnAngle = 0;
+  rollangle = 0;
+  turnEyeAngle = 0;
+    // caculate movestepX and vector len for moving car
+  moveStepX = tan(M_PI/180) * moveStepZ;
+  vectorLen = sqrt(moveStepX*moveStepX + moveStepZ*moveStepZ);
 
   //populate our arrays
   spherevertcount = generateSphere(2, 30);
@@ -729,6 +1039,101 @@ void init() {
 	glEnable(GL_DEPTH_TEST);
 }
 
+/////////////////////////////////////////
+// special keys
+/////////////////////////////////////////
+void special(int key, int x, int y){
+
+	// restart the game
+	if (key == GLUT_KEY_F2)
+	{
+		init();
+		glutIdleFunc(NULL);
+	}
+	else if(key == GLUT_KEY_UP) // car move forward
+	{
+		bmoveForward = true;
+				
+		if ( currentZ >= 1 )
+		{
+			currentZ = 0.999;
+		}
+		else if ( currentZ <= -1 )
+		{
+			currentZ = -0.999;
+		}
+
+		if ( currentX >= 1 )
+		{
+			currentX = 0.999;
+		}
+		else if ( currentX <= -1 )
+		{
+			currentX = -0.999;
+		}
+
+	}
+	else if(key == GLUT_KEY_DOWN) // car moves backward
+	{
+		bmoveForward = false;
+		if ( currentZ >= 1 )
+		{
+			currentZ = 0.999;
+		}
+		else if ( currentZ <= -1 )
+		{
+			currentZ = -0.999;
+		}
+
+		if ( currentX >= 1 )
+		{
+			currentX = 0.999;
+		}
+		else if ( currentX <= -1 )
+		{
+			currentX = -0.999;
+		}
+	}
+	else if(key == GLUT_KEY_LEFT) // move wheels to left
+	{
+		if ( turnAngle >= maxTurnWheel )
+		{
+			turnAngle = maxTurnWheel;
+		}
+		else
+		{
+			turnAngle += 1;
+		}
+		
+	}
+	else if(key == GLUT_KEY_RIGHT) // move wheels to right
+	{
+	
+		if ( turnAngle <= -maxTurnWheel )
+		{
+			turnAngle = -maxTurnWheel;
+		}
+		else
+		{
+			turnAngle -= 1;
+		}
+
+		
+	}
+	
+	printf("=============================\n");
+	printf("moveStepX : %f\n", moveStepX);
+	printf("moveStepZ : %f\n", moveStepZ);
+	printf("vectorLen : %f\n", vectorLen);
+	printf("currentX : %f\n", currentX);
+	printf("currentZ : %f\n", currentZ);
+	printf("turnCarAngle : %f\n", turnCarAngle);
+	printf("turnAngle : %f\n", turnAngle);
+ 	
+
+	//don't forget to request a new frame since parameters have changed
+	glutPostRedisplay();
+}
 int main(int argc, char **argv)
 {
   /*set up window for display*/
@@ -736,7 +1141,7 @@ int main(int argc, char **argv)
   glutInitWindowPosition(0, 0); 
   glutInitWindowSize(ww, wh);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutCreateWindow("Lighting Exercise");  
+  glutCreateWindow("UST Noir");  
 
   glewExperimental = GL_TRUE;
 
@@ -745,6 +1150,7 @@ int main(int argc, char **argv)
 
   glutDisplayFunc(display);
   glutKeyboardFunc(Keyboard);
+  glutSpecialFunc(special);
   glutReshapeFunc(reshape);
   //glutIdleFunc(idle);
   glutMouseFunc(mouse);
