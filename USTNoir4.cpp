@@ -24,6 +24,8 @@ matrix_stack stack;
 
 GLuint program1, program2, program3;
 
+GLboolean turnOnPoliceLight;
+GLboolean startcar;
 
 vec4* headVers;
 vec3* headNormals;
@@ -1494,13 +1496,17 @@ void setupStageShader(GLuint prog)
 /////////////////////////////////////////
 void myIdle()
 {
-	if ( turnPoliceLampAngle > 360 )
+	if ( turnOnPoliceLight == true )
 	{
-		turnPoliceLampAngle = 0;
-	}
+		if ( turnPoliceLampAngle > 360 )
+		{
+			turnPoliceLampAngle = 0;
+		}
 	
-	turnPoliceLampAngle += 1;
+		turnPoliceLampAngle += 1;
+	}
 
+	
 	GLint moveF = 1;
 	if ( bmoveForward == true )
 	{
@@ -1511,12 +1517,9 @@ void myIdle()
 		moveF = -1;
 	}
 
-	
-
 	//chasecamlookdirection = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * chasecamlookdirection;
 	//viewpointcam = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * viewpointcam;
-
-		
+			
 	if ( pointCameraAt == true ) // point the stage
 	{
 		atX = 0;
@@ -1531,109 +1534,129 @@ void myIdle()
 	if ( currentX > -1 && currentX < 1 &&
 		 currentZ > -1 && currentZ < 1 ) 
 	{
-		if ( bmoveForward == true )
+		if ( startcar == true )
 		{
+			if ( bmoveForward == true )
+			{
 		
-			if ( turnAngle < 0)
-			{
-				turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;
-			}
-			else if ( turnAngle > 0)
-			{
-				turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;
-			}
+				if ( turnAngle < 0)
+				{
+					turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;
+				}
+				else if ( turnAngle > 0)
+				{
+					turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;
+				}
 			
 	
-			moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
-			moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
+				moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
+				moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
 
-			currentX = currentX + moveStepX;
-			currentZ = currentZ + moveStepZ;
+				currentX = currentX + moveStepX;
+				currentZ = currentZ + moveStepZ;
 
 			
-			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-			policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
+				policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
+				policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
 
-			policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-			policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
+				policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
+				policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
 
-			if ( currentX < -1.0 )
-			{
-				currentX = -1.00f;
-			}
-			else if ( currentX > 1.0 )
-			{
-				currentX = 1.00f;
-			}
-			else if ( currentZ > 1.0 )
-			{
-				currentZ = 1.00f;
-			}
-			else if ( currentZ < -1.0 )
-			{
-				currentZ = -1.00f;
+				if ( currentX < -1.0 )
+				{
+					currentX = -1.00f;
+				}
+				else if ( currentX > 1.0 )
+				{
+					currentX = 1.00f;
+				}
+				else if ( currentZ > 1.0 )
+				{
+					currentZ = 1.00f;
+				}
+				else if ( currentZ < -1.0 )
+				{
+					currentZ = -1.00f;
+				}
+				else
+				{
+			
+				}
+
+				rollangle += (vectorLen * 360)/(0.05*M_PI);
 			}
 			else
 			{
-			
-			}
-
-			rollangle += (vectorLen * 360)/(0.05*M_PI);
-		}
-		else
-		{
-			if ( turnAngle < 0)
-			{
-				turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;;
-			}
-			else if ( turnAngle > 0)
-			{
-				turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;;
-			}
+				if ( turnAngle < 0)
+				{
+					turnCarAngle += 0.2*abs(turnAngle)/maxTurnWheel;;
+				}
+				else if ( turnAngle > 0)
+				{
+					turnCarAngle -= 0.2*abs(turnAngle)/maxTurnWheel;;
+				}
 		
-			moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
-			moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
+				moveStepX = vectorLen * sin(turnCarAngle*M_PI/180);
+				moveStepZ  = vectorLen * cos(turnCarAngle*M_PI/180);
 
-			currentX = currentX - moveStepX;
-			currentZ = currentZ - moveStepZ;
+				currentX = currentX - moveStepX;
+				currentZ = currentZ - moveStepZ;
 
 
-			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-			policeredlightlampDest   = vec4(0.015, -0.905, -5,0);
+				policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
+				policeredlightlampDest   = vec4(0.015, -0.905, -5,0);
 
-			policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-			policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
+				policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
+				policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
 
-			if ( currentX < -1.0 )
-			{
-				currentX = -1.00f;
-			}
-			else if ( currentX > 1.0 )
-			{
-				currentX = 1.00f;
-			}
-			else if ( currentZ > 1.0 )
-			{
-				currentZ = 1.00f;
-			}
-			else if ( currentZ < -1.0 )
-			{
-				currentZ = -1.00f;
-			}
+				if ( currentX < -1.0 )
+				{
+					currentX = -1.00f;
+				}
+				else if ( currentX > 1.0 )
+				{
+					currentX = 1.00f;
+				}
+				else if ( currentZ > 1.0 )
+				{
+					currentZ = 1.00f;
+				}
+				else if ( currentZ < -1.0 )
+				{
+					currentZ = -1.00f;
+				}
 		
 
-			rollangle -= (vectorLen * 360)/(0.05*M_PI);
+				rollangle -= (vectorLen * 360)/(0.05*M_PI);
+			}
 		}
 
 		glutPostRedisplay();
 	}
-} 
+}
+/////////////////////////////////////////////
+// keyboard
+/////////////////////////////////////////////
+
 void Keyboard(unsigned char key, int x, int y) {
 	/*exit when the escape key is pressed*/
 	if (key == 27)
 		exit(0);
 
-	if (key == 'w' || key == 'W' ) // dolly in
+	if (key == 'L' || key == 'l' ) // turnon/off police lights
+	{
+		if ( turnOnPoliceLight == true )
+		{
+			turnOnPoliceLight = false;
+		}
+		else
+		{
+			turnOnPoliceLight = true;
+		}
+
+		glutIdleFunc(myIdle);
+	}
+	else if (key == 'w' || key == 'W' ) // dolly in
 	{
 		dollyzoom += 1;
 	}
@@ -1736,12 +1759,14 @@ void Keyboard(unsigned char key, int x, int y) {
 	}
 	if ( key == 'b' || key == 'B' ) // to start the car
 	{
+		startcar = true;
 		glutIdleFunc(myIdle);
 	}
 
 	if ( key == 32 ) // to stop car moving
 	{
-		glutIdleFunc(NULL);
+		startcar = false;
+		glutIdleFunc(myIdle);
 	}
 	else if(key == 'z')
 	{
@@ -1778,9 +1803,9 @@ void Keyboard(unsigned char key, int x, int y) {
 		if(rz > 360)
 			rz -= 360;
 	}else if(key == 'l'){
-		rz -= 5;
+		/*rz -= 5;
 		if(rz < 0)
-			rz += 360;
+			rz += 360;*/
 	}
 
 	printf("rx = %f\n", rx);
@@ -1841,6 +1866,8 @@ void init() {
 
   
     turnPoliceLampAngle = 0;
+	turnOnPoliceLight = false;
+	startcar = false;
 
   //set up transformation defaults
   //start with no translation or rotation
