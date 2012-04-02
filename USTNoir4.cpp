@@ -2087,8 +2087,8 @@ void init() {
   rightlampSource.z = 0.1;
   rightlampDest.z = 1.0;
 
-  rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-  rightlampDest   = vec4(rightlampDest.x,  -0.99,rightlampDest.z,  0); 
+  rightlampSource = vec4(rightlampSource.x,-0.93,rightlampSource.z,1); 
+  rightlampDest   = vec4(rightlampDest.x,  -1,rightlampDest.z,  0); 
 
   // left lamp
   leftlampSource.x	= 0.02;
@@ -2096,8 +2096,8 @@ void init() {
   leftlampSource.z = 0.1;
   leftlampDest.z = 1.0;
   
-  leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
-  leftlampDest   = vec4(leftlampDest.x,  -0.99,leftlampDest.z,  0); 
+  leftlampSource = vec4(leftlampSource.x,-0.93,leftlampSource.z,1); 
+  leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
 
   policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
   policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);

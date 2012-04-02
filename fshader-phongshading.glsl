@@ -69,7 +69,7 @@ void main()
 					  }
 					  else
 					  {
-						  attenuation = 1;//attenuation * pow(clampedCosine, spot_exponent);   
+						  attenuation = 0.9; ////attenuation * pow(clampedCosine, 50);   
 					  }
 			}
 	
