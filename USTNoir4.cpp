@@ -24,6 +24,20 @@ matrix_stack stack;
 
 GLuint program1, program2, program3;
 
+/////////////////////////
+// the chase camera
+/////////////////////////
+
+vec4 viewportcamlookdirection = vec4(0, 0, 0.07f, 0);
+vec4 viewpointcam;
+
+vec4 * chasecamVers;
+vec4 chasecamColors[400];
+GLuint chasecamvao[1];
+GLuint chasecamvbo[2];
+int totalchasecamverts;
+vec4 chasecamlookdirection;
+
 GLboolean turnOnPoliceLight;
 GLboolean startcar;
 
@@ -288,7 +302,56 @@ void reshape(int width, int height){
 		
 }
 
+/////////////////////////////////////////
+// generateHead
+/////////////////////////////////////////
+void generateChaseCamera()
+{
+	
+	int subdiv = 10;
+	int radius = 1;
 
+	float step = (360.0/subdiv)*(M_PI/180.0);
+
+	totalchasecamverts = ceil(subdiv/2.0)*subdiv * 6;
+
+	if(chasecamVers){
+		delete[] chasecamVers;
+	}
+
+	chasecamVers = new vec4[totalchasecamverts];
+
+	int k = 0;
+	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
+		for(float j = -M_PI; j<=M_PI; j+=step){
+			//triangle 1
+			chasecamVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			k++;
+	
+			chasecamVers[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
+			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			k++;
+			
+			chasecamVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			k++;
+
+			//triangle 2
+			chasecamVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			chasecamColors[k] = vec4(1.0, 1.0, 1.0, 1.0);
+			k++;
+
+			chasecamVers[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
+			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			k++;
+
+			chasecamVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			chasecamColors[k] = vec4(1.0, 1.0, 1.0, 1.0);
+			k++;
+		}
+	}
+}
 /////////////////////////////////////////
 // generateStage
 /////////////////////////////////////////
@@ -1133,19 +1196,53 @@ void displayPoliceLamps()
 
 void display(void)
 {
-  /*clear all pixels*/
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    //mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
+	/*clear all pixels*/
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
 
-	mv = LookAt(vec4(0, 0, dollyzoom, 1.0), vec4(atX, 0, atZ, 1.0), vec4(0, 1, 0, 0.0));
+	if ( switchcamera == 0 ) // static cam
+	{
+		mv = LookAt(vec4(0, 0, dollyzoom, 1.0), vec4(atX, 0, atZ, 1.0), vec4(0, 1, 0, 0.0));
 
-	//mv = mv * Translate(tx, ty, tz);
-	mv = mv *RotateX(rx);
-	//mv = mv * RotateY(ry);
-	//mv = mv * RotateZ(rz);
+		//mv = mv * Translate(tx, ty, tz);
+		mv = mv *RotateX(rx);
+		//mv = mv * RotateY(ry);
+		//mv = mv * RotateZ(rz);
 
-	mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+		mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+
+	}
+	else if (switchcamera == 1) // chase cam
+	{
+		
+		mv = LookAt(vec4(currentX, -0.91, currentZ, 1.0), // eye
+			       vec4(chasecamlookdirection.x*10, -0.91, chasecamlookdirection.z*10, 1.0), // at
+				   vec4(0, 1, 0, 0.0));    // up
+	}
+	else // viewport cam
+	{
+		vec4 viewpoint = vec4(0,0,1,0);
+		vec4 view = vec4(0,0,1,0);
+
+		if ( turnEyeRight != 0)
+		{
+			
+			viewpoint = RotateY(turnEyeAngle) * viewpointcam;
+
+			view = viewpoint;
+			
+		}
+		else
+		{
+			view = viewpointcam;
+		}
+		
+
+		mv = LookAt(vec4(currentX, -0.90, currentZ, 1.0), // eye
+			       vec4(view.x*10, -0.90, view.z*10, 1.0), // at
+				   vec4(0, 1, 0, 0.0));    // up
+	}
+
 
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 	
@@ -1155,7 +1252,6 @@ void display(void)
 		
 
 	displayStage();
-	
 	displayCar();
 	displayHead();
 	displayPoliceLamps();
@@ -1213,27 +1309,27 @@ void setupShader(GLuint prog){
 	///////////////////////////////////////////////////
 	//setup left headlight
 	///////////////////////////////////////////////////
-	headleftlight_position	= glGetUniformLocation(prog, "lights[3].position");
-	headleftdiffuse_color		= glGetUniformLocation(prog, "lights[3].diffuse");
-	headleftspecular_color		= glGetUniformLocation(prog, "lights[3].specular");
+	headleftlight_position	= glGetUniformLocation(prog, "lights[2].position");
+	headleftdiffuse_color		= glGetUniformLocation(prog, "lights[2].diffuse");
+	headleftspecular_color		= glGetUniformLocation(prog, "lights[2].specular");
 	headambient_light		= glGetUniformLocation(prog, "ambient_light");
 
-	headleftspot_direction	= glGetUniformLocation(prog, "lights[3].spot_direction");
-	headleftspot_cutoff			= glGetUniformLocation(prog, "lights[3].spot_cutoff");
-	headleftspot_exponent		= glGetUniformLocation(prog, "lights[3].spot_exponent");
+	headleftspot_direction	= glGetUniformLocation(prog, "lights[2].spot_direction");
+	headleftspot_cutoff			= glGetUniformLocation(prog, "lights[2].spot_cutoff");
+	headleftspot_exponent		= glGetUniformLocation(prog, "lights[2].spot_exponent");
  
 
 	///////////////////////////////////////////////////
 	// setup red police light
 	//////////////////////////////////////////////////
-	policeredlight_position = glGetUniformLocation(prog, "lights[2].position");
-	policereddiffuse_color  = glGetUniformLocation(prog, "lights[2].diffuse");
-	policeredspecular_color = glGetUniformLocation(prog, "lights[2].specular");
+	policeredlight_position = glGetUniformLocation(prog, "lights[3].position");
+	policereddiffuse_color  = glGetUniformLocation(prog, "lights[3].diffuse");
+	policeredspecular_color = glGetUniformLocation(prog, "lights[3].specular");
 	policeredambient_light  = glGetUniformLocation(prog, "ambient_light");
 
-	policeredspot_direction = glGetUniformLocation(prog, "lights[2].spot_direction");
-	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[2].spot_cutoff");
-	policeredspot_exponent  = glGetUniformLocation(prog, "lights[2].spot_exponent");
+	policeredspot_direction = glGetUniformLocation(prog, "lights[3].spot_direction");
+	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[3].spot_cutoff");
+	policeredspot_exponent  = glGetUniformLocation(prog, "lights[3].spot_exponent");
  
 	///////////////////////////////////////////////////
 	// setup blue police light
@@ -1517,8 +1613,8 @@ void myIdle()
 		moveF = -1;
 	}
 
-	//chasecamlookdirection = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * chasecamlookdirection;
-	//viewpointcam = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * viewpointcam;
+	chasecamlookdirection = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * chasecamlookdirection;
+	viewpointcam = RotateY((moveF)*0.2*(turnAngle)/maxTurnWheel) * viewpointcam;
 			
 	if ( pointCameraAt == true ) // point the stage
 	{
@@ -1695,7 +1791,7 @@ void Keyboard(unsigned char key, int x, int y) {
 	}
 	else if (key == 'c' || key == 'C' )
 	{
-		/*if ( switchcamera == 0 )
+		if ( switchcamera == 0 )
 		{
 			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 1;
@@ -1710,7 +1806,7 @@ void Keyboard(unsigned char key, int x, int y) {
 			reshape(ww, wh);
 			switchcamera = 0;
 		}
-*/
+
 	}
 	else if (key == 'f' || key == 'F' ) // toggle b/t look at origin or current car postion
 	{
@@ -1729,25 +1825,27 @@ void Keyboard(unsigned char key, int x, int y) {
 	{
 
 
-		/*if ( switchcamera == 0)
+		if ( switchcamera == 0)
 		{
 			lenszoom += 1;
 			reshape(ww, wh);
 		}
 		else
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);*/
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
 			
 	}
 	else if (key == 'a' || key == 'A' ) // to zoom in
 	{
 		
-		/*if ( switchcamera == 0)
+		if ( switchcamera == 0)
 		{
 			lenszoom -= 1;
 			reshape(ww, wh);
 		}
 		else
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);*/
+		{
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+		}
 	}
 	else if (key == 'w' || key == 'W' ) // dolly in
 	{
@@ -1883,6 +1981,12 @@ void init() {
   // False: point at the car
   pointCameraAt = true;
   switchcamera = 0; //
+
+  
+  chasecamlookdirection		= vec4(0.0, 0.0 , 0.07,0);
+  viewportcamlookdirection  = vec4(0.0, 0.0 , 0.07,0);
+  viewpointcam = vec4(0.0, 0.0 , 0.07,0);
+
   ///////////////////
   // assighment 2
   ///////////////////
