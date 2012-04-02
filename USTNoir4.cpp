@@ -24,11 +24,19 @@ matrix_stack stack;
 
 GLuint program1, program2, program3;
 
+
+vec4* headVers;
+vec3* headNormals;
+GLint totalheadverts;
+
 GLuint policeredvao[1];
 GLuint policeredvbo[2];
 GLuint policebluevao[1];
 GLuint policebluevbo[2];
 GLfloat turnPoliceLampAngle;
+
+GLuint headvao[1];
+GLuint headvbo[2];
 
 GLuint carvao[1];
 GLuint carvbo[2];
@@ -177,6 +185,9 @@ GLuint vStageAmbientDiffuseColor;
 GLuint vStageSpecularColor;
 GLuint vStageSpecularExponent;
 
+GLuint vHeadAmbientDiffuseColor;
+GLuint vHeadSpecularColor;
+GLuint vHeadSpecularExponent;
 
 GLuint vCarAmbientDiffuseColor;
 GLuint vCarSpecularColor;
@@ -305,6 +316,60 @@ void generateStage(){
 
 }
 
+/////////////////////////////////////////
+// generateHead
+/////////////////////////////////////////
+void generateHead()
+{
+	//generateEyes();
+
+	int subdiv = 10;
+	int radius = 1;
+
+	float step = (360.0/subdiv)*(M_PI/180.0);
+
+	totalheadverts = ceil(subdiv/2.0)*subdiv * 6;
+
+	if(headNormals){
+		delete[] headNormals;
+	}
+	headNormals = new vec3[totalheadverts];
+	if(headVers){
+		delete[] headVers;
+	}
+	headVers = new vec4[totalheadverts];
+
+	int k = 0;
+	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
+		for(float j = -M_PI; j<=M_PI; j+=step){
+			//triangle 1
+			headNormals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
+			headVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			k++;
+	
+			headNormals[k]= vec3(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step));
+			headVers[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
+			k++;
+			
+			headNormals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
+			headVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			k++;
+
+			//triangle 2
+			headNormals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
+			headVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			k++;
+
+			headNormals[k]= vec3(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i));
+			headVers[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
+			k++;
+
+			headNormals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
+			headVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			k++;
+		}
+	}
+}
 /////////////////////////////////////////
 // generateCar
 /////////////////////////////////////////
@@ -763,7 +828,74 @@ void displayStage(void)
 	glDrawArrays( GL_TRIANGLES, 0, 6 );    // draw the sphere 
    
 }
+/////////////////////////////////////////
+// displayHead
+/////////////////////////////////////////
+void displayHead()
+{
+	
+	stack.push(mv);
 
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+
+	mv = mv * Translate(0, -0.91, 0.01); // 0.05
+	mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
+	mv = mv * Scale(0.02,0.02,0.02);
+	
+	glVertexAttrib4fv(vHeadAmbientDiffuseColor, vec4(0, 0, 0.0, 1));
+	glVertexAttrib4fv(vHeadSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib1f(vHeadSpecularExponent, 10.0);
+
+	DrawTriagle(headvao, totalheadverts);
+
+	mv = stack.pop();
+
+
+	//////////////////////////////////////////
+	// EYE
+	//////////////////////////////////////////
+	
+
+	// left eye
+	//stack.push(mv);
+	//
+	//mv = mv * Translate(currentX, 0, currentZ);
+	//mv = mv * RotateY(turnCarAngle);
+
+	////mv = mv * Translate(0, 0, 0.05);
+	//
+	//mv = mv * Translate(0, 0.034, 0.015);
+	//mv = mv * RotateY(turnEyeAngle);
+	//mv = mv * Translate(0.006, -0.905, 0.01); // -0.905
+	////mv = mv * Translate(0.006, -0.905, 0.07);
+	//mv = mv * RotateX(90);
+	//mv = mv * Scale(0.005f,0.005f,0.005f);
+
+	//DrawTriagle(eyevao, 144);
+
+	//mv = stack.pop();
+
+	//// right eye
+	//stack.push(mv);
+	//
+	//
+	//mv = mv * Translate(currentX, 0, currentZ);
+	//mv = mv * RotateY(turnCarAngle);
+	//	
+	////mv = mv * Translate(0, 0, 0.05);
+	//mv = mv * Translate(0, 0.034, 0.015);
+	//mv = mv * RotateY(turnEyeAngle);
+	//mv = mv * Translate(-0.006, -0.905, 0.01);
+	//mv = mv * RotateX(90);
+	//mv = mv * Scale(0.005f,0.005f,0.005f);
+
+	//DrawTriagle(eyevao, 144);
+
+	//mv = stack.pop();
+
+
+}
 
 /////////////////////////////////////////
 // displayCar
@@ -1023,6 +1155,7 @@ void display(void)
 	displayStage();
 	
 	displayCar();
+	displayHead();
 	displayPoliceLamps();
 	displayWheels();
 		
@@ -1130,6 +1263,37 @@ void setupShader(GLuint prog){
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+
+///////////////////////////////////////////////////
+// setupHeadShader
+//////////////////////////////////////////////////
+void setupHeadShader(GLuint prog)
+{
+	vHeadAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vHeadSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vHeadSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
+		// Create a vertex array object
+    glGenVertexArrays( 1, &headvao[0] );
+	glBindVertexArray( headvao[0] );
+	glGenBuffers( 2, &headvbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, headvbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, totalheadverts*sizeof(vec4), headVers, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, headvbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, totalheadverts*sizeof(vec3), headNormals, GL_STATIC_DRAW );
+
+
+	glBindVertexArray( headvao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, headvbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, headvbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+}
 ///////////////////////////////////////////////////
 // setupCarShader
 //////////////////////////////////////////////////
@@ -1219,7 +1383,9 @@ void setupPoliceLightShader(GLuint prog)
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-
+///////////////////////////////////////////////////
+// setupWheelShader
+//////////////////////////////////////////////////
 void setupWheelShader(GLuint prog)
 {
 	vWheelSide1AmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
@@ -1294,6 +1460,9 @@ void setupWheelShader(GLuint prog)
 
 
 }
+///////////////////////////////////////////////////
+// setupStageShader
+//////////////////////////////////////////////////
 void setupStageShader(GLuint prog)
 {
 	
@@ -1382,13 +1551,6 @@ void myIdle()
 			currentZ = currentZ + moveStepZ;
 
 			
-			/*rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
-
-			leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
-			leftlampDest   = vec4(leftlampDest.x,  -0.99,leftlampDest.z, 0); */
-
-			
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
 			policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
 
@@ -1434,14 +1596,6 @@ void myIdle()
 
 			currentX = currentX - moveStepX;
 			currentZ = currentZ - moveStepZ;
-
-			
-
-			/*rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
-
-			leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
-			leftlampDest   = vec4(leftlampDest.x,-0.99,leftlampDest.z, 0); */
 
 
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
@@ -1745,6 +1899,7 @@ void init() {
   spherevertcount = generateSphere(2, 30);
     generateStage();
 	generateCar();
+	generateHead();
 	generatePoliceLamp();
 	generateWheelSides();
 
@@ -1757,6 +1912,7 @@ void init() {
 	setupShader(program2);
 	setupStageShader(program2);
 	setupCarShader(program2);
+	setupHeadShader(program2);
 	setupPoliceLightShader(program2);
 	setupWheelShader(program2);
 
