@@ -23,7 +23,7 @@ struct lightSource
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
 	vec3 spot_direction;
 };
-const int numberofLightSources = 3;
+const int numberofLightSources = 4;
 uniform lightSource lights[numberofLightSources];
 
 vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
