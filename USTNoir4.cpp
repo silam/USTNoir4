@@ -32,7 +32,6 @@ vec4 viewportcamlookdirection = vec4(0, 0, 0.07f, 0);
 vec4 viewpointcam;
 
 vec4 * chasecamVers;
-vec4 chasecamColors[400];
 GLuint chasecamvao[1];
 GLuint chasecamvbo[2];
 int totalchasecamverts;
@@ -45,11 +44,18 @@ vec4* headVers;
 vec3* headNormals;
 GLint totalheadverts;
 
+vec4* simpleObjVers;
+vec3* simpleObjNormals;
+GLint totalsimpleobjverts;
+
 GLuint policeredvao[1];
 GLuint policeredvbo[2];
 GLuint policebluevao[1];
 GLuint policebluevbo[2];
 GLfloat turnPoliceLampAngle;
+
+GLuint simpleObjvao[1];
+GLuint simpleObjvbo[2];
 
 GLuint headvao[1];
 GLuint headvbo[2];
@@ -209,6 +215,10 @@ GLuint vCarAmbientDiffuseColor;
 GLuint vCarSpecularColor;
 GLuint vCarSpecularExponent;
 
+GLuint vSimpleObjAmbientDiffuseColor;
+GLuint vSimpleObjSpecularColor;
+GLuint vSimpleObjSpecularExponent;
+
 
 GLuint moonlight_position;
 //GLuint moonlight_color;
@@ -303,9 +313,9 @@ void reshape(int width, int height){
 }
 
 /////////////////////////////////////////
-// generateHead
+// generateChaseCamera
 /////////////////////////////////////////
-void generateChaseCamera()
+void generateSimpleObject()
 {
 	
 	int subdiv = 10;
@@ -313,41 +323,49 @@ void generateChaseCamera()
 
 	float step = (360.0/subdiv)*(M_PI/180.0);
 
-	totalchasecamverts = ceil(subdiv/2.0)*subdiv * 6;
+	totalsimpleobjverts = ceil(subdiv/2.0)*subdiv * 6;
 
-	if(chasecamVers){
-		delete[] chasecamVers;
+	if(simpleObjVers){
+		delete[] simpleObjVers;
 	}
 
-	chasecamVers = new vec4[totalchasecamverts];
+	simpleObjVers = new vec4[totalsimpleobjverts];
+
+	if(simpleObjNormals){
+		delete[] simpleObjNormals;
+	}
+	simpleObjNormals = new vec3[totalsimpleobjverts];
 
 	int k = 0;
 	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
 		for(float j = -M_PI; j<=M_PI; j+=step){
 			//triangle 1
-			chasecamVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			simpleObjNormals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
+			simpleObjVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			
 			k++;
 	
-			chasecamVers[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
-			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
-			k++;
+			simpleObjNormals[k]= vec3(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step));
+			simpleObjVers[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
 			
-			chasecamVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			k++;
+			simpleObjNormals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
+			simpleObjVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			
 			k++;
 
 			//triangle 2
-			chasecamVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			chasecamColors[k] = vec4(1.0, 1.0, 1.0, 1.0);
+			simpleObjNormals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
+			simpleObjVers[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
+			
 			k++;
-
-			chasecamVers[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
-			chasecamColors[k] = vec4(1.0, 0.0, 1.0, 1.0);
+			simpleObjNormals[k]= vec3(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i));
+			simpleObjVers[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
+			
 			k++;
-
-			chasecamVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			chasecamColors[k] = vec4(1.0, 1.0, 1.0, 1.0);
+			simpleObjNormals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
+			simpleObjVers[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
+			
 			k++;
 		}
 	}
@@ -805,7 +823,7 @@ void setupPoliceLight()
 	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,0.0f,.0f,1));
 	glUniform4fv(policeredambient_light,  1, vec4(.2, .2, .2, 1));
 
-	glUniform1f(policeredspot_cutoff, 15);
+	glUniform1f(policeredspot_cutoff, 45);
 	glUniform1f(policeredspot_exponent, 120);
 
 	// blue light
@@ -820,7 +838,7 @@ void setupPoliceLight()
 	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
 
-	glUniform1f(policebluespot_cutoff, 15);
+	glUniform1f(policebluespot_cutoff, 45);
 	glUniform1f(policebluespot_exponent, 120);
 
 	
@@ -892,6 +910,43 @@ void displayStage(void)
 	glBindVertexArray( stagevao[0] );
 	glDrawArrays( GL_TRIANGLES, 0, 6 );    // draw the sphere 
    
+}
+/////////////////////////////////////////
+// displaySimpleObj
+/////////////////////////////////////////
+void displaySimpleObj()
+{
+	
+	stack.push(mv);
+		
+	mv = mv * Translate(0.8, -0.9, 0.8); // 0.05
+	//mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
+	mv = mv * Scale(0.2,0.2,0.2);
+	
+	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(0, 1.0, 1.0, 1));
+	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
+
+	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+
+	mv = stack.pop();
+
+	//////////
+
+	stack.push(mv);
+		
+	mv = mv * Translate(-0.8, -0.9, 0.8); // 0.05
+	//mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
+	mv = mv * Scale(0.2,0.2,0.2);
+	
+	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1, 0.0, .5, 1));
+	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
+
+	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+
+	mv = stack.pop();
+
 }
 /////////////////////////////////////////
 // displayHead
@@ -1252,6 +1307,7 @@ void display(void)
 		
 
 	displayStage();
+	displaySimpleObj();
 	displayCar();
 	displayHead();
 	displayPoliceLamps();
@@ -1392,6 +1448,37 @@ void setupHeadShader(GLuint prog)
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+///////////////////////////////////////////////////
+// setupHeadShader
+//////////////////////////////////////////////////
+void setupSimpleObjShader(GLuint prog)
+{
+	vSimpleObjAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vSimpleObjSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vSimpleObjSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
+		// Create a vertex array object
+    glGenVertexArrays( 1, &simpleObjvao[0] );
+	glBindVertexArray( simpleObjvao[0] );
+	glGenBuffers( 2, &simpleObjvbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, totalsimpleobjverts*sizeof(vec4), simpleObjVers, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, totalsimpleobjverts*sizeof(vec3), simpleObjNormals, GL_STATIC_DRAW );
+
+
+	glBindVertexArray( simpleObjvao[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[0] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[1] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
 ///////////////////////////////////////////////////
 // setupCarShader
 //////////////////////////////////////////////////
@@ -2026,9 +2113,11 @@ void init() {
   moveStepX = tan(M_PI/180) * moveStepZ;
   vectorLen = sqrt(moveStepX*moveStepX + moveStepZ*moveStepZ);
 
-  //populate our arrays
-  spherevertcount = generateSphere(2, 30);
+   //populate our arrays
+    //spherevertcount = generateSphere(2, 30);
+    
     generateStage();
+	generateSimpleObject();
 	generateCar();
 	generateHead();
 	generatePoliceLamp();
@@ -2042,6 +2131,7 @@ void init() {
 		
 	setupShader(program2);
 	setupStageShader(program2);
+	setupSimpleObjShader(program2);
 	setupCarShader(program2);
 	setupHeadShader(program2);
 	setupPoliceLightShader(program2);
