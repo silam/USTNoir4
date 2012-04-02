@@ -56,6 +56,9 @@ GLfloat rx, ry, rz;
 vec4 rightlampSource;
 vec4 rightlampDest;
 
+vec4 leftlampSource;
+vec4 leftlampDest;
+
 vec4 policeredlightlampSource;
 vec4 policeredlightlampDest;
 
@@ -190,14 +193,16 @@ GLuint moonambient_light;
 //GLuint spot_direction;
 
 
-GLuint headlight_position;
+GLuint headrightlight_position;
+GLuint headleftlight_position;
 //GLuint headlight_color;
 GLuint headdiffuse_color;
 GLuint headspecular_color;
 GLuint headambient_light;
 GLuint headspot_cutoff;
 GLuint headspot_exponent;
-GLuint headspot_direction;
+GLuint headrightspot_direction;
+GLuint headleftspot_direction;
 
 
 GLuint policeredlight_position;
@@ -655,13 +660,10 @@ void generatePoliceLamp()
 
 void setupPoliceLight()
 {
-	//stack.push(mv);
+	
 
-	/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);*/
-	//policeredlightlampDest = RotateY(turnPoliceLampAngle)*policeredlightlampDest;
-
-	glUniform4fv(policeredlight_position, 1, mv*policeredlightlampSource); 
-	glUniform4fv(policeredspot_direction, 1, mv*policeredlightlampDest);
+	glUniform4fv(policeredlight_position, 1, mv*Translate(currentX, 0, currentZ)*policeredlightlampSource); 
+	glUniform4fv(policeredspot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
 
 	//mv = stack.pop();
 
@@ -675,8 +677,8 @@ void setupPoliceLight()
 
 	// blue light
 
-	glUniform4fv(policebluelight_position, 1, mv*policebluelightlampSource); 
-	glUniform4fv(policebluespot_direction, 1, mv*policebluelightlampDest);
+	glUniform4fv(policebluelight_position, 1, mv*Translate(currentX, 0, currentZ)*policebluelightlampSource); 
+	glUniform4fv(policebluespot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
 
 	//mv = stack.pop();
 
@@ -690,30 +692,38 @@ void setupPoliceLight()
 
 	
 }
-
+//////////////////////////////////////////
+// setup head lights
+//////////////////////////////////////////
 void setupHeadLight()
 {
 	
-	//stack.push(mv);
+	// right lamp
+	glUniform4fv(headrightlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampSource);
+	glUniform4fv(headrightspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampDest);
 
-		/*mv = mv * Translate(rightlampSource.x, 0, rightlampSource.z);
-		mv = mv * RotateY(turnCarAngle);*/
-
-		glUniform4fv(headlight_position, 1, mv*rightlampSource); //1));
-		glUniform4fv(headspot_direction, 1, mv*rightlampDest);//vec4(0, -10, 0));
-
-	//mv = stack.pop();
-
-	//glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
 	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
-
-	
 	glUniform1f(headspot_cutoff, 30);
 	glUniform1f(headspot_exponent, 10);
 
+
+	// left lamp
+	glUniform4fv(headleftlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampSource);
+	glUniform4fv(headleftspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampDest);
+
+	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
+	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
+	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+	glUniform1f(headspot_cutoff, 30);
+	glUniform1f(headspot_exponent, 10);
+
+
 }
+//////////////////////////////////////////
+// setup moon light (directional light)
+//////////////////////////////////////////
 void setupMoonLight()
 {
 	glUniform4fv(moonlight_position, 1, mv*vec4(100, 100, 100, 0)); //1));
@@ -751,19 +761,7 @@ void displayStage(void)
    
 }
 
-void moveHeadLight()
-{
-	//stack.push(mv);
-		
-	
-	/*vec4 rightlampSource = vec4(currentX,-0.93,currentZ,1); 
-	vec3 rightlampDest   = vec3(currentX,-0.99,currentZ + 0.05); 
-	
-	glUniform4fv(headlight_position, 1, mv*rightlampSource); 
-	glUniform4fv(headspot_direction, 1, mv*rightlampDest);*/
-	
-	//mv = stack.pop();
-}
+
 /////////////////////////////////////////
 // displayCar
 /////////////////////////////////////////
@@ -1056,46 +1054,60 @@ void setupShader(GLuint prog){
 	///////////////////////////////////////////////////
 	// setup moonlight
 	///////////////////////////////////////////////////
-	moonlight_position = glGetUniformLocation(prog, "lights[0].position");
-	moondiffuse_color = glGetUniformLocation(prog, "lights[0].diffuse");
-	moonspecular_color = glGetUniformLocation(prog, "lights[0].specular");
-	moonambient_light = glGetUniformLocation(prog, "ambient_light");
+	moonlight_position	= glGetUniformLocation(prog, "lights[0].position");
+	moondiffuse_color	= glGetUniformLocation(prog, "lights[0].diffuse");
+	moonspecular_color	= glGetUniformLocation(prog, "lights[0].specular");
+	moonambient_light	= glGetUniformLocation(prog, "ambient_light");
 
 	///////////////////////////////////////////////////
-	//setup headlight
+	//setup right headlight
 	///////////////////////////////////////////////////
-	headlight_position = glGetUniformLocation(prog, "lights[1].position");
-	headdiffuse_color = glGetUniformLocation(prog, "lights[1].diffuse");
-	headspecular_color = glGetUniformLocation(prog, "lights[1].specular");
-	headambient_light = glGetUniformLocation(prog, "ambient_light");
+	headrightlight_position = glGetUniformLocation(prog, "lights[1].position");
+	headdiffuse_color		= glGetUniformLocation(prog, "lights[1].diffuse");
+	headspecular_color		= glGetUniformLocation(prog, "lights[1].specular");
+	headambient_light		= glGetUniformLocation(prog, "ambient_light");
 
-	headspot_direction = glGetUniformLocation(prog, "lights[1].spot_direction");
-	headspot_cutoff = glGetUniformLocation(prog, "lights[1].spot_cutoff");
-	headspot_exponent = glGetUniformLocation(prog, "lights[1].spot_exponent");
+	headrightspot_direction = glGetUniformLocation(prog, "lights[1].spot_direction");
+	headspot_cutoff			= glGetUniformLocation(prog, "lights[1].spot_cutoff");
+	headspot_exponent		= glGetUniformLocation(prog, "lights[1].spot_exponent");
  
+
 	///////////////////////////////////////////////////
-	// setup police light
+	//setup left headlight
+	///////////////////////////////////////////////////
+	headleftlight_position	= glGetUniformLocation(prog, "lights[2].position");
+	headdiffuse_color		= glGetUniformLocation(prog, "lights[2].diffuse");
+	headspecular_color		= glGetUniformLocation(prog, "lights[2].specular");
+	headambient_light		= glGetUniformLocation(prog, "ambient_light");
+
+	headleftspot_direction	= glGetUniformLocation(prog, "lights[2].spot_direction");
+	headspot_cutoff			= glGetUniformLocation(prog, "lights[2].spot_cutoff");
+	headspot_exponent		= glGetUniformLocation(prog, "lights[2].spot_exponent");
+ 
+
+	///////////////////////////////////////////////////
+	// setup red police light
 	//////////////////////////////////////////////////
-	policeredlight_position = glGetUniformLocation(prog, "lights[2].position");
-	policereddiffuse_color  = glGetUniformLocation(prog, "lights[2].diffuse");
-	policeredspecular_color = glGetUniformLocation(prog, "lights[2].specular");
+	policeredlight_position = glGetUniformLocation(prog, "lights[3].position");
+	policereddiffuse_color  = glGetUniformLocation(prog, "lights[3].diffuse");
+	policeredspecular_color = glGetUniformLocation(prog, "lights[3].specular");
 	policeredambient_light  = glGetUniformLocation(prog, "ambient_light");
 
-	policeredspot_direction = glGetUniformLocation(prog, "lights[2].spot_direction");
-	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[2].spot_cutoff");
-	policeredspot_exponent  = glGetUniformLocation(prog, "lights[2].spot_exponent");
+	policeredspot_direction = glGetUniformLocation(prog, "lights[3].spot_direction");
+	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[3].spot_cutoff");
+	policeredspot_exponent  = glGetUniformLocation(prog, "lights[3].spot_exponent");
  
 	///////////////////////////////////////////////////
-	// setup police light
+	// setup blue police light
 	//////////////////////////////////////////////////
-	policebluelight_position = glGetUniformLocation(prog, "lights[3].position");
-	policebluediffuse_color = glGetUniformLocation(prog, "lights[3].diffuse");
-	policebluespecular_color = glGetUniformLocation(prog, "lights[3].specular");
-	policeredambient_light = glGetUniformLocation(prog, "ambient_light");
+	policebluelight_position	= glGetUniformLocation(prog, "lights[4].position");
+	policebluediffuse_color		= glGetUniformLocation(prog, "lights[4].diffuse");
+	policebluespecular_color	= glGetUniformLocation(prog, "lights[4].specular");
+	policeredambient_light		= glGetUniformLocation(prog, "ambient_light");
 
-	policebluespot_direction = glGetUniformLocation(prog, "lights[3].spot_direction");
-	policebluespot_cutoff = glGetUniformLocation(prog, "lights[3].spot_cutoff");
-	policebluespot_exponent = glGetUniformLocation(prog, "lights[3].spot_exponent");
+	policebluespot_direction	= glGetUniformLocation(prog, "lights[4].spot_direction");
+	policebluespot_cutoff		= glGetUniformLocation(prog, "lights[4].spot_cutoff");
+	policebluespot_exponent		= glGetUniformLocation(prog, "lights[4].spot_exponent");
  
 
 	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
@@ -1362,15 +1374,12 @@ void myIdle()
 			currentX = currentX + moveStepX;
 			currentZ = currentZ + moveStepZ;
 
-			rightlampSource.x = rightlampSource.x + moveStepX;
-			rightlampSource.z = rightlampSource.z + moveStepZ;
-
-			rightlampDest.x = rightlampDest.x + moveStepX;
-			rightlampDest.z = rightlampDest.z + moveStepZ;
-
+			
 			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
 			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
 
+			leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
+			leftlampDest   = vec4(leftlampDest.x,  -0.99,leftlampDest.z, 0); 
 
 			
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
@@ -1419,14 +1428,14 @@ void myIdle()
 			currentX = currentX - moveStepX;
 			currentZ = currentZ - moveStepZ;
 
-			rightlampSource.x = rightlampSource.x - moveStepX;
-			rightlampSource.z = rightlampSource.z - moveStepZ;
-
-			rightlampDest.x = rightlampDest.x - moveStepX;
-			rightlampDest.z = rightlampDest.z - moveStepZ;
+			
 
 			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
 			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
+
+			leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
+			leftlampDest   = vec4(leftlampDest.x,-0.99,leftlampDest.z, 0); 
+
 
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
 			policeredlightlampDest   = vec4(0.015, -0.905, -5,0);
@@ -1693,12 +1702,21 @@ void init() {
   moveStepZ = 0.0005;
   currentX = currentZ = 0;
 
+  // right lamp
   rightlampDest.x = rightlampSource.x = -0.02;
   rightlampSource.z = 0.1;
-  rightlampDest.z = 0.2;
+  rightlampDest.z = 1.0;
 
   rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-  rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
+  rightlampDest   = vec4(rightlampDest.x,  -0.99,rightlampDest.z,  0); 
+
+  // left lamp
+  leftlampDest.x = leftlampSource.x = 0.02;
+  leftlampSource.z = 0.1;
+  leftlampDest.z = 1.0;
+  
+  leftlampSource = vec4(leftlampSource.x,-0.90,leftlampSource.z,1); 
+  leftlampDest   = vec4(leftlampDest.x,  -0.99,leftlampDest.z,  0); 
 
   policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
   policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);

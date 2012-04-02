@@ -23,7 +23,7 @@ struct lightSource
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
 	vec4 spot_direction;
 };
-const int numberofLightSources = 4;
+const int numberofLightSources = 5;
 uniform lightSource lights[numberofLightSources];
 
 vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -50,8 +50,7 @@ void main()
 
 	for ( int index = 0; index < numberofLightSources;index++)
 	{
-		
-		
+				
 		if ( lights[index].position.w == 0 ) // directional light
 		{
 			attenuation = 1;
