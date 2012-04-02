@@ -9,7 +9,7 @@ in float SpecularExponent;
 uniform vec4 light_position;
 uniform vec4 light_color;
 uniform vec4 ambient_light;
-uniform vec3 spot_direction;
+uniform vec4 spot_direction;
 uniform float spot_cutoff;
 uniform float spot_exponent;
 
@@ -21,7 +21,7 @@ struct lightSource
 	vec4 specular;
 	float constantAttenuation, linearAttenuation, quadraticAttenuation;
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
-	vec3 spot_direction;
+	vec4 spot_direction;
 };
 const int numberofLightSources = 4;
 uniform lightSource lights[numberofLightSources];

@@ -54,13 +54,13 @@ GLfloat tx, ty, tz;
 GLfloat rx, ry, rz;
 
 vec4 rightlampSource;
-vec3 rightlampDest;
+vec4 rightlampDest;
 
 vec4 policeredlightlampSource;
-vec3 policeredlightlampDest;
+vec4 policeredlightlampDest;
 
 vec4 policebluelightlampSource;
-vec3 policebluelightlampDest;
+vec4 policebluelightlampDest;
 
 //////////////////////////////////////////////////
 // // turn the wheel left/right angle
@@ -228,7 +228,7 @@ struct lightSource
 	vec4 specular;
 	float constantAttenuation, linearAttenuation, quadraticAttenuation;
 	float spotCutoff, spotCosCutoff, spotExponent;
-	vec3 spotDirection;
+	vec4 spotDirection;
 };
 lightSource directionalLight, spotLightHeadLamp;
 const int numberofLightSources = 2;
@@ -1369,15 +1369,15 @@ void myIdle()
 			rightlampDest.z = rightlampDest.z + moveStepZ;
 
 			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-			rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
 
 
 			
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-			policeredlightlampDest   = vec3(0.015, -0.905, -5);
+			policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
 
 			policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-			policebluelightlampDest   = vec3(-0.015, -0.905, 5);
+			policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
 
 			if ( currentX < -1.0 )
 			{
@@ -1426,13 +1426,13 @@ void myIdle()
 			rightlampDest.z = rightlampDest.z - moveStepZ;
 
 			rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-			rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+			rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
 
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-			policeredlightlampDest   = vec3(0.015, -0.905, -5);
+			policeredlightlampDest   = vec4(0.015, -0.905, -5,0);
 
 			policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-			policebluelightlampDest   = vec3(-0.015, -0.905, 5);
+			policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
 
 			if ( currentX < -1.0 )
 			{
@@ -1698,13 +1698,13 @@ void init() {
   rightlampDest.z = 0.2;
 
   rightlampSource = vec4(rightlampSource.x,-0.90,rightlampSource.z,1); 
-  rightlampDest   = vec3(rightlampDest.x,-0.99,rightlampDest.z); 
+  rightlampDest   = vec4(rightlampDest.x,-0.99,rightlampDest.z, 0); 
 
   policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-  policeredlightlampDest   = vec3(0.015, -0.905, -5);
+  policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
 
   policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-  policebluelightlampDest   = vec3(-0.015, -0.905, 5);
+  policebluelightlampDest   = vec4(-0.015, -0.905, 5, 0);
 
   turnCarAngle = 0;
   turnAngle = 0;
