@@ -6,7 +6,7 @@ in vec3 vNormal;
 in vec4 vSpecularColor;
 in float vSpecularExponent;
 
-out vec4 color;
+//out vec4 color;
 out vec3 position;
 out vec3 vN;
 
@@ -28,11 +28,9 @@ main()
 	SpecularExponent = vSpecularExponent;
 	
 	vec4 veyepos = model_view*vPosition;
-	
-	
+		
 	vN = normalize(model_view * vNormal).xyz;
 	
-	//spec = vec4(1,1,1,1);
 	position = veyepos.xyz;
 	gl_Position = projection * veyepos;
 	

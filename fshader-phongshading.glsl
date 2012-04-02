@@ -55,7 +55,7 @@ void main()
 		if ( lights[index].position.w == 0 ) // directional light
 		{
 			attenuation = 1;
-			L = normalize( lights[index].position.xyz);// - position.xyz);
+			L = normalize( lights[index].position.xyz - position.xyz);
 		}
 		else // spot light
 		{

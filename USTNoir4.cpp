@@ -114,7 +114,7 @@ GLuint vNormal;
 vec4 wheelCylinderVers[414];
 vec4 vWheelCylinderNormals[414];
 
-vec4 wheelCylinderColors[500];
+//vec4 wheelCylinderColors[500];
 
 GLuint cylindervao[1];
 GLuint cylindervbo[2];
@@ -181,7 +181,7 @@ GLuint vCarSpecularExponent;
 
 
 GLuint moonlight_position;
-GLuint moonlight_color;
+//GLuint moonlight_color;
 GLuint moondiffuse_color;
 GLuint moonspecular_color;
 GLuint moonambient_light;
@@ -191,7 +191,7 @@ GLuint moonambient_light;
 
 
 GLuint headlight_position;
-GLuint headlight_color;
+//GLuint headlight_color;
 GLuint headdiffuse_color;
 GLuint headspecular_color;
 GLuint headambient_light;
@@ -201,7 +201,7 @@ GLuint headspot_direction;
 
 
 GLuint policeredlight_position;
-GLuint policeredlight_color;
+//GLuint policeredlight_color;
 GLuint policereddiffuse_color;
 GLuint policeredspecular_color;
 GLuint policeredambient_light;
@@ -210,7 +210,7 @@ GLuint policeredspot_exponent;
 GLuint policeredspot_direction;
 
 GLuint policebluelight_position;
-GLuint policebluelight_color;
+//GLuint policebluelight_color;
 GLuint policebluediffuse_color;
 GLuint policebluespecular_color;
 GLuint policeblueambient_light;
@@ -494,10 +494,10 @@ void generateWheelSides()
 		
 
 		point4 b = wheelSide2Verts[point++] = vec4(cos(angle*M_PI/180), side*(-1.0f), -sin(angle*M_PI/180), 1.0); 
-		wheelside2Colors[point] = vec4(0.5f,0.5f,0.5f, 1.0); 
+		//wheelside2Colors[point] = vec4(0.5f,0.5f,0.5f, 1.0); 
 
 		point4 c = wheelSide2Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
-		wheelside2Colors[point] = vec4(0.5f ,0.5f,0.5f, 1.0); 
+		//wheelside2Colors[point] = vec4(0.5f ,0.5f,0.5f, 1.0); 
 
 		vec3 normal = normalize(cross(c-b, a -b));
 
@@ -661,11 +661,11 @@ void setupPoliceLight()
 	//policeredlightlampDest = RotateY(turnPoliceLampAngle)*policeredlightlampDest;
 
 	glUniform4fv(policeredlight_position, 1, mv*policeredlightlampSource); 
-	glUniform4fv(policeredspot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
+	glUniform4fv(policeredspot_direction, 1, mv*policeredlightlampDest);
 
 	//mv = stack.pop();
 
-	glUniform4fv(policeredlight_color,    1, vec4(1.0f,0.0f,.0f,1));
+	//glUniform4fv(policeredlight_color,    1, vec4(1.0f,0.0f,.0f,1));
 	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f,0.0f,.0f,1));
 	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,0.0f,.0f,1));
 	glUniform4fv(policeredambient_light,  1, vec4(.2, .2, .2, 1));
@@ -676,11 +676,11 @@ void setupPoliceLight()
 	// blue light
 
 	glUniform4fv(policebluelight_position, 1, mv*policebluelightlampSource); 
-	glUniform4fv(policebluespot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
+	glUniform4fv(policebluespot_direction, 1, mv*policebluelightlampDest);
 
 	//mv = stack.pop();
 
-	glUniform4fv(policebluelight_color,    1, vec4(0.0f,0.0f,1.0f,1));
+	//glUniform4fv(policebluelight_color,    1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policebluediffuse_color,  1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
@@ -704,7 +704,7 @@ void setupHeadLight()
 
 	//mv = stack.pop();
 
-	glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
+	//glUniform4fv(headlight_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
 	glUniform4fv(headspecular_color, 1, vec4(1,.8f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
@@ -1020,7 +1020,7 @@ void display(void)
 		
 
 	displayStage();
-	moveHeadLight();
+	
 	displayCar();
 	displayPoliceLamps();
 	displayWheels();
@@ -1052,10 +1052,7 @@ void setupShader(GLuint prog){
 	model_view = glGetUniformLocation(prog, "model_view");
 	projection = glGetUniformLocation(prog, "projection");
 	
-	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
-
+	
 	///////////////////////////////////////////////////
 	// setup moonlight
 	///////////////////////////////////////////////////
@@ -1080,13 +1077,13 @@ void setupShader(GLuint prog){
 	// setup police light
 	//////////////////////////////////////////////////
 	policeredlight_position = glGetUniformLocation(prog, "lights[2].position");
-	policereddiffuse_color = glGetUniformLocation(prog, "lights[2].diffuse");
+	policereddiffuse_color  = glGetUniformLocation(prog, "lights[2].diffuse");
 	policeredspecular_color = glGetUniformLocation(prog, "lights[2].specular");
-	policeredambient_light = glGetUniformLocation(prog, "ambient_light");
+	policeredambient_light  = glGetUniformLocation(prog, "ambient_light");
 
 	policeredspot_direction = glGetUniformLocation(prog, "lights[2].spot_direction");
-	policeredspot_cutoff = glGetUniformLocation(prog, "lights[2].spot_cutoff");
-	policeredspot_exponent = glGetUniformLocation(prog, "lights[2].spot_exponent");
+	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[2].spot_cutoff");
+	policeredspot_exponent  = glGetUniformLocation(prog, "lights[2].spot_exponent");
  
 	///////////////////////////////////////////////////
 	// setup police light
@@ -1101,6 +1098,9 @@ void setupShader(GLuint prog){
 	policebluespot_exponent = glGetUniformLocation(prog, "lights[3].spot_exponent");
  
 
+	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
 
 	glBindVertexArray( vao[0] );
@@ -1374,7 +1374,7 @@ void myIdle()
 
 			
 			policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-			policeredlightlampDest   = vec3(0.015, -0.905, 5);
+			policeredlightlampDest   = vec3(0.015, -0.905, -5);
 
 			policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
 			policebluelightlampDest   = vec3(-0.015, -0.905, 5);
@@ -1704,7 +1704,7 @@ void init() {
   policeredlightlampDest   = vec3(0.015, -0.905, -5);
 
   policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-  policebluelightlampDest   = vec3(-0.015, -0.905, -5);
+  policebluelightlampDest   = vec3(-0.015, -0.905, 5);
 
   turnCarAngle = 0;
   turnAngle = 0;
@@ -1722,9 +1722,9 @@ void init() {
 	generateWheelSides();
 
    // Load shaders and use the resulting shader program
-    program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
+    //program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
 	program2 = InitShader( "vshader-phongshading.glsl", "fshader-phongshading.glsl" );
-	program3 = InitShader( "vshader-celshading.glsl", "fshader-celshading.glsl" );
+	//program3 = InitShader( "vshader-celshading.glsl", "fshader-celshading.glsl" );
     glUseProgram(0 );
 		
 	setupShader(program2);
