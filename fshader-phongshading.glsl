@@ -23,7 +23,7 @@ struct lightSource
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
 	vec3 spot_direction;
 };
-const int numberofLightSources = 2;
+const int numberofLightSources = 3;
 uniform lightSource lights[numberofLightSources];
 
 vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -55,7 +55,7 @@ void main()
 		if ( lights[index].position.w == 0 ) // directional light
 		{
 			attenuation = 1;
-			L = normalize( lights[index].position.xyz - position.xyz);
+			L = normalize( lights[index].position.xyz);// - position.xyz);
 		}
 		else // spot light
 		{
@@ -89,7 +89,7 @@ void main()
 			spec = vec4(0,0,0,1);
 		}
 	
-		final_color = amb + diff + spec;
+		final_color += amb + diff + spec;
 	}
 	fColor = final_color;
 }
