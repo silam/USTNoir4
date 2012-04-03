@@ -22,7 +22,7 @@ matrix_stack stack;
 
 #define M_PI 3.14159265358979323846
 
-GLuint program1, program2, program3;
+GLuint program;
 
 vec4 lightOn = vec4(0,0,0,1);
 vec4 lightOff = vec4(0,0,0,0);
@@ -41,37 +41,86 @@ GLuint chasecamvbo[2];
 int totalchasecamverts;
 vec4 chasecamlookdirection;
 
-GLboolean turnOnPoliceLight;
+
 GLboolean startcar;
 
-vec4* headVers;
-vec3* headNormals;
-GLint totalheadverts;
 
-vec4* simpleObjVers;
-vec3* simpleObjNormals;
-GLint totalsimpleobjverts;
 
+
+////////////////////////////////
+// police light variables
+////////////////////////////////
 GLuint policeredvao[1];
 GLuint policeredvbo[2];
 GLuint policebluevao[1];
 GLuint policebluevbo[2];
 GLfloat turnPoliceLampAngle;
+GLboolean turnOnPoliceLight;
+vec4 policeredlightlampSource;
+vec4 policeredlightlampDest;
+vec4 policebluelightlampSource;
+vec4 policebluelightlampDest;
 
+////////////////////////////////
+// simple objects variables
+////////////////////////////////
 GLuint simpleObjvao[1];
 GLuint simpleObjvbo[2];
+vec4* simpleObjVers;
+vec3* simpleObjNormals;
+GLint totalsimpleobjverts;
 
+
+////////////////////////////////
+// driver head variables
+////////////////////////////////
 GLuint headvao[1];
 GLuint headvbo[2];
+vec4* headVers;
+vec3* headNormals;
+GLint totalheadverts;
+GLuint vHeadAmbientDiffuseColor;
+GLuint vHeadSpecularColor;
+GLuint vHeadSpecularExponent;
 
+////////////////////////////////
+// car variables
+////////////////////////////////
 GLuint carvao[1];
 GLuint carvbo[2];
+
+//////////////////////////////////////////////////
+// // turn the wheel left/right angle
+//////////////////////////////////////////////////
+GLfloat turnAngle;
+GLfloat turnCarAngle = 0;
+GLfloat maxTurnWheel = 45.00f;
+
+////////////////////////////////
+// stage variables
+////////////////////////////////
 GLuint stagevao[1];
 GLuint stagevbo[2];
-GLuint vao[1];
-GLuint vbo[2];
-int spherevertcount;
-int mode = 0;
+
+
+
+////////////////////////////////
+// head lights variables
+////////////////////////////////
+vec4 rightlampSource;
+vec4 rightlampDest;
+vec4 leftlampSource;
+vec4 leftlampDest;
+
+
+/////////////////////////
+// wheel cylinder
+/////////////////////////
+vec4 wheelCylinderVers[414];
+vec4 vWheelCylinderNormals[414];
+GLuint cylindervao[1];
+GLuint cylindervbo[2];
+
 
 int right_button_down = FALSE;
 int left_button_down = FALSE;
@@ -87,25 +136,9 @@ double z_distance;
 GLfloat tx, ty, tz;
 GLfloat rx, ry, rz;
 
-vec4 rightlampSource;
-vec4 rightlampDest;
 
-vec4 leftlampSource;
-vec4 leftlampDest;
 
-vec4 policeredlightlampSource;
-vec4 policeredlightlampDest;
 
-vec4 policebluelightlampSource;
-vec4 policebluelightlampDest;
-
-//////////////////////////////////////////////////
-// // turn the wheel left/right angle
-//////////////////////////////////////////////////
-GLfloat turnAngle;
-GLfloat turnCarAngle = 0;
-
-GLfloat maxTurnWheel = 45.00f;
 
 //////////////////////////////////////////////////
 // current position of the car
@@ -145,20 +178,17 @@ GLuint vPosition;
 GLuint vNormal;
 
 
-/////////////////////////
-// wheel cylinder
-/////////////////////////
-vec4 wheelCylinderVers[414];
-vec4 vWheelCylinderNormals[414];
 
-GLuint cylindervao[1];
-GLuint cylindervbo[2];
-
+/////////////////////////
 // eye
+/////////////////////////
 vec4 eyeVerts[75];
 vec4 eyeNormals[75];
 GLuint eyevao[1];
 GLuint eyevbo[2];
+GLuint vEyeAmbientDiffuseColor;
+GLuint vEyeSpecularColor;
+GLuint vEyeSpecularExponent;
 
 /////////////////////////
 // wheel side vertices
@@ -177,9 +207,9 @@ GLuint wheelside1vbo[2];
 
 GLuint wheelside2vao[1];
 GLuint wheelside2vbo[2];
-
+////////////////////////
 // WHEEEL
-
+/////////////////////////
 GLuint vWheelSide1AmbientDiffuseColor;
 GLuint vWheelSide1AmbientColor;
 GLuint vWheelSide1DiffuseColor; //Ambient and Diffuse can be the same for the material
@@ -203,10 +233,9 @@ GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
 GLuint vSpecularExponent;
 
-GLuint vEyeAmbientDiffuseColor;
-GLuint vEyeSpecularColor;
-GLuint vEyeSpecularExponent;
-
+//////////////////////////////
+// police
+/////////////////////////////
 GLuint vPoliceRedAmbientDiffuseColor;
 GLuint vPoliceRedSpecularColor;
 GLuint vPoliceRedSpecularExponent;
@@ -215,23 +244,46 @@ GLuint vPoliceBlueAmbientDiffuseColor;
 GLuint vPoliceBlueSpecularColor;
 GLuint vPoliceBlueSpecularExponent;
 
+vec4* policeLampRedVerts;
+vec3* policeLampRedNormals;
+vec4* policeLampBlueVerts;
+vec3* policeLampBlueNormals;
+
+
+//////////////////////////////
+// Stage
+/////////////////////////////
+
 GLuint vStageAmbientDiffuseColor;
 GLuint vStageSpecularColor;
 GLuint vStageSpecularExponent;
+vec4* sphere_verts;
+vec3* sphere_normals;
+vec4* stageVerts;
+vec3* stageNormals;
 
-GLuint vHeadAmbientDiffuseColor;
-GLuint vHeadSpecularColor;
-GLuint vHeadSpecularExponent;
 
+//////////////////////////////
+// car
+/////////////////////////////
 GLuint vCarAmbientDiffuseColor;
 GLuint vCarSpecularColor;
 GLuint vCarSpecularExponent;
 
+vec4* carVerts;
+vec3* carNormals;
+vec4* carColors;
+
+//////////////////////////////
+// simple objects
+/////////////////////////////
 GLuint vSimpleObjAmbientDiffuseColor;
 GLuint vSimpleObjSpecularColor;
 GLuint vSimpleObjSpecularExponent;
 
-
+//////////////////////////////
+// moon light
+//////////////////////////////
 GLuint moonlight_position;
 //GLuint moonlight_color;
 GLuint moondiffuse_color;
@@ -240,7 +292,9 @@ GLuint moonlightOn;
 GLuint moonambient_light;
 GLboolean ismoonOn;
 
-
+//////////////////////////////
+// head light
+//////////////////////////////
 GLuint headrightlight_position;
 GLuint headrightdiffuse_color;
 GLuint headrightspot_cutoff;
@@ -259,8 +313,10 @@ GLuint headleftspot_exponent;
 GLuint headleftspot_direction;
 GLuint headleftOn;
 
+//////////////////////////////
+// police light
+//////////////////////////////
 GLuint policeredlight_position;
-//GLuint policeredlight_color;
 GLuint policereddiffuse_color;
 GLuint policeredspecular_color;
 GLuint policeredambient_light;
@@ -270,7 +326,6 @@ GLuint policeredspot_direction;
 GLuint policeRedOn;
 
 GLuint policebluelight_position;
-//GLuint policebluelight_color;
 GLuint policebluediffuse_color;
 GLuint policebluespecular_color;
 GLuint policeblueambient_light;
@@ -279,7 +334,9 @@ GLuint policebluespot_exponent;
 GLuint policebluespot_direction;
 GLuint policeBlueOn;
 
-
+//////////////////////////////
+// lightsouce structure
+//////////////////////////////
 struct lightSource
 {
 	vec4 ambient;
@@ -290,10 +347,14 @@ struct lightSource
 	float spotCutoff, spotCosCutoff, spotExponent;
 	vec4 spotDirection;
 };
+
 lightSource directionalLight, spotLightHeadLamp;
 const int numberofLightSources = 2;
 lightSource lights[numberofLightSources];
 
+//////////////////////////////
+// material structure
+//////////////////////////////
 struct material
 {
 	vec4 ambient;
@@ -302,21 +363,9 @@ struct material
 	float shininess;
 };
 
-vec4* sphere_verts;
-vec3* sphere_normals;
-
-vec4* policeLampRedVerts;
-vec3* policeLampRedNormals;
-vec4* policeLampBlueVerts;
-vec3* policeLampBlueNormals;
-
-vec4* stageVerts;
-vec3* stageNormals;
-
-vec4* carVerts;
-vec3* carNormals;
-vec4* carColors;
-
+/////////////////////////////////////////
+//reshape
+/////////////////////////////////////////
 void reshape(int width, int height){
 	ww= width;
 	wh = height;
@@ -1356,18 +1405,18 @@ void display(void)
 void setupShader(GLuint prog){
 	
 	// Create a vertex array object
-    glGenVertexArrays( 1, &vao[0] );
+    //glGenVertexArrays( 1, &vao[0] );
 
     // Create and initialize any buffer objects
-	glBindVertexArray( vao[0] );
-	glGenBuffers( 2, &vbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
-    glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
-	
+	//glBindVertexArray( vao[0] );
+	//glGenBuffers( 2, &vbo[0] );
+ //   glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+ //   glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
+	//
 
-	//and now our colors for each vertex
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
+	////and now our colors for each vertex
+	//glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	//glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
 
 
 	glUseProgram( prog );
@@ -1435,7 +1484,7 @@ void setupShader(GLuint prog){
 	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
-	glBindVertexArray( vao[0] );
+	/*glBindVertexArray( vao[0] );
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	vPosition = glGetAttribLocation(prog, "vPosition");
@@ -1445,7 +1494,7 @@ void setupShader(GLuint prog){
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 ///////////////////////////////////////////////////
@@ -1909,16 +1958,7 @@ void Keyboard(unsigned char key, int x, int y) {
 	{
 		dollyzoom -= 1;
 	}
-	else if (key == 'g'){
-		setupShader(program1);
-		setupStageShader(program3);
-	}
-	else if (key == 'p'){
-		setupShader(program2);
-		setupStageShader(program3);
-	}
-		
-	if (key == 'r' || key == 'R' )
+	else if (key == 'r' || key == 'R' )
 	{
 		 ///////////////////
 		  // assighment 3
@@ -2074,7 +2114,9 @@ void mouse_dragged(int x, int y) {
   glutPostRedisplay();
 }
 
-
+/////////////////////////////////////////////
+// mouse
+///////////////////////////////////////////
 void mouse(int button, int state, int x, int y) {
   //establish point of reference for dragging mouse in window
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
@@ -2093,80 +2135,74 @@ void mouse(int button, int state, int x, int y) {
 	  right_button_down = FALSE;
 	}
 }
-
-
+/////////////////////////////////////////////
+// INIT
+///////////////////////////////////////////
 void init() {
 
-  /*select clearing (background) color*/
-  glClearColor(0.0, 0.0, 0.0, 1.0);
-
-  
+	/*select clearing (background) color*/
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	  
     turnPoliceLampAngle = 0;
 	turnOnPoliceLight = false;
 	startcar = false;
 
-  //set up transformation defaults
-  //start with no translation or rotation
-  tx = ty = tz = rx = ry = rz = 0;
+	  atX = atZ = 0;
+	  dollyzoom = 3.0f;
+	  lenszoom = 45.0;
+	  rx = 30;
+	  ty = 0.8;
+	  tz = 19.2;
+	  // TRUE: point camear at the center, 
+	  // False: point at the car
+	  pointCameraAt = true;
+	  switchcamera = 0; //
+	    
+	  chasecamlookdirection		= vec4(0.0, 0.0 , 0.07,0);
+	  viewportcamlookdirection  = vec4(0.0, 0.0 , 0.07,0);
+	  viewpointcam				= vec4(0.0, 0.0 , 0.07,0);
 
-   atX = atZ = 0;
-  dollyzoom = 3.0f;
-  lenszoom = 45.0;
-   rx = 30;
-  ty = 0.8;
-  tz = 19.2;
-  // TRUE: point camear at the center, 
-  // False: point at the car
-  pointCameraAt = true;
-  switchcamera = 0; //
+	  ///////////////////
+	  // assighment 2
+	  ///////////////////
+	  bmoveForward = true;
+	  moveStepZ = 0.0005;
+	  currentX = currentZ = 0;
 
+	  // right lamp
+	  rightlampSource.x = -0.02;
+	  rightlampDest.x	= -0.04;
+	  rightlampSource.z = 0.2;
+	  rightlampDest.z = 1.0;
+
+	  rightlampSource = vec4(rightlampSource.x,-0.97,rightlampSource.z,1); 
+	  rightlampDest   = vec4(rightlampDest.x,  -1,rightlampDest.z,  0); 
+
+	  // left lamp
+	  leftlampSource.x	= 0.02;
+	  leftlampDest.x	= 0.04;
+	  leftlampSource.z = 0.2;
+	  leftlampDest.z = 1.0;
   
-  chasecamlookdirection		= vec4(0.0, 0.0 , 0.07,0);
-  viewportcamlookdirection  = vec4(0.0, 0.0 , 0.07,0);
-  viewpointcam = vec4(0.0, 0.0 , 0.07,0);
+	  leftlampSource = vec4(leftlampSource.x,-0.97,leftlampSource.z,1); 
+	  leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
 
-  ///////////////////
-  // assighment 2
-  ///////////////////
-  bmoveForward = true;
-  moveStepZ = 0.0005;
-  currentX = currentZ = 0;
+	  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+	  policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
 
-  // right lamp
-  rightlampSource.x = -0.02;
-  rightlampDest.x	= -0.04;
-  rightlampSource.z = 0.2;
-  rightlampDest.z = 1.0;
+	  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+	  policebluelightlampDest   = vec4(-0.015, -0.8, 5, 0);
 
-  rightlampSource = vec4(rightlampSource.x,-0.97,rightlampSource.z,1); 
-  rightlampDest   = vec4(rightlampDest.x,  -1,rightlampDest.z,  0); 
+	  turnCarAngle = 0;
+	  turnAngle = 0;
+	  rollangle = 0;
+	  turnEyeAngle = 0;
+		// caculate movestepX and vector len for moving car
+	  moveStepX = tan(M_PI/180) * moveStepZ;
+	  vectorLen = sqrt(moveStepX*moveStepX + moveStepZ*moveStepZ);
 
-  // left lamp
-  leftlampSource.x	= 0.02;
-  leftlampDest.x	= 0.04;
-  leftlampSource.z = 0.2;
-  leftlampDest.z = 1.0;
-  
-  leftlampSource = vec4(leftlampSource.x,-0.97,leftlampSource.z,1); 
-  leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
-
-  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
-  policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
-
-  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-  policebluelightlampDest   = vec4(-0.015, -0.8, 5, 0);
-
-  turnCarAngle = 0;
-  turnAngle = 0;
-  rollangle = 0;
-  turnEyeAngle = 0;
-    // caculate movestepX and vector len for moving car
-  moveStepX = tan(M_PI/180) * moveStepZ;
-  vectorLen = sqrt(moveStepX*moveStepX + moveStepZ*moveStepZ);
-
-   //populate our arrays
-    //spherevertcount = generateSphere(2, 30);
-    
+   
+    // generate objects 
     generateStage();
 	generateSimpleObject();
 	generateCar();
@@ -2175,20 +2211,18 @@ void init() {
 	generatePoliceLamp();
 	generateWheelSides();
 
-   // Load shaders and use the resulting shader program
-    //program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
-	program2 = InitShader( "vshader-phongshading.glsl", "fshader-phongshading.glsl" );
-	//program3 = InitShader( "vshader-celshading.glsl", "fshader-celshading.glsl" );
-    glUseProgram(0 );
+    // Load shaders and use the resulting shader program
+    program = InitShader( "vshader-phongshading.glsl", "fshader-phongshading.glsl" );
+	glUseProgram(0 );
 		
-	setupShader(program2);
-	setupStageShader(program2);
-	setupSimpleObjShader(program2);
-	setupCarShader(program2);
-	setupHeadShader(program2);
-	setupEyeShader(program2);
-	setupPoliceLightShader(program2);
-	setupWheelShader(program2);
+	setupShader(program);
+	setupStageShader(program);
+	setupSimpleObjShader(program);
+	setupCarShader(program);
+	setupHeadShader(program);
+	setupEyeShader(program);
+	setupPoliceLightShader(program);
+	setupWheelShader(program);
 
   //Only draw the things in the front layer
 	glEnable(GL_DEPTH_TEST);
@@ -2291,26 +2325,26 @@ void special(int key, int x, int y){
 }
 int main(int argc, char **argv)
 {
-  /*set up window for display*/
-  glutInit(&argc, argv);
-  glutInitWindowPosition(0, 0); 
-  glutInitWindowSize(ww, wh);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutCreateWindow("UST Noir");  
+	  /*set up window for display*/
+	  glutInit(&argc, argv);
+	  glutInitWindowPosition(0, 0); 
+	  glutInitWindowSize(ww, wh);
+	  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	  glutCreateWindow("UST Noir");  
 
-  glewExperimental = GL_TRUE;
+	  glewExperimental = GL_TRUE;
 
-	glewInit();
-  init();
+	  glewInit();
+	  init();
 
-  glutDisplayFunc(display);
-  glutKeyboardFunc(Keyboard);
-  glutSpecialFunc(special);
-  glutReshapeFunc(reshape);
-  //glutIdleFunc(idle);
-  glutMouseFunc(mouse);
-  glutMotionFunc(mouse_dragged);
+	  glutDisplayFunc(display);
+	  glutKeyboardFunc(Keyboard);
+	  glutSpecialFunc(special);
+	  glutReshapeFunc(reshape);
+	  //glutIdleFunc(idle);
+	  glutMouseFunc(mouse);
+	  glutMotionFunc(mouse_dragged);
 
-  glutMainLoop();
-  return 0;
+	  glutMainLoop();
+	  return 0;
 }
