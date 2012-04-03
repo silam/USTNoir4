@@ -76,7 +76,7 @@ void main()
 					  }
 					  else
 					  {
-						  attenuation = 0.9; ////attenuation * pow(clampedCosine, 50);   
+						  attenuation = 1; // attenuation * pow(clampedCosine, 50);   
 					  }
 			}
 	
@@ -87,9 +87,9 @@ void main()
 
 		vec3 H = normalize(L+E);
 
-		vec4 diff = attenuation*max(dot(L,N), 0.0) * AmbientDiffuseColor * lights[index].diffuse;
+		vec4 diff = attenuation*clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
 
-		vec4 spec = attenuation*pow( max (dot(N,H), 0.0), SpecularExponent) *  SpecularColor * lights[index].specular;
+		vec4 spec = attenuation*pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
 	
 		if(dot(L,N) < 0.0){
 			spec = vec4(0,0,0,1);
