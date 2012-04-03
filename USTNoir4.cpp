@@ -820,25 +820,25 @@ void setupPoliceLight()
 {
 	
 	glUniform4fv(policeredlight_position, 1, mv*Translate(currentX, 0, currentZ)*policeredlightlampSource); 
-	glUniform4fv(policeredspot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
+	glUniform4fv(policeredspot_direction, 1, mv*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
 
 	
 	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f,0.0f,.0f,1));
-	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,0.0f,.0f,1));
+	glUniform4fv(policeredspecular_color, 1, vec4(0.0f,0.0f,.0f,1));
 	glUniform4fv(policeredambient_light,  1, vec4(0.2, 0.2, 0.2, 1));
 
 	glUniform1f(policeredspot_cutoff, 45);
 	glUniform1f(policeredspot_exponent, 120);
-	glUniform1i(policeRedOn, 1);
+	
 
 	// blue light
 
 	glUniform4fv(policebluelight_position, 1, mv*Translate(currentX, 0, currentZ)*policebluelightlampSource); 
-	glUniform4fv(policebluespot_direction, 1, mv*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
+	glUniform4fv(policebluespot_direction, 1, mv*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
 
 	
 	glUniform4fv(policebluediffuse_color,  1, vec4(0.0f,0.0f,1.0f,1));
-	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
+	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,0.0f,1));
 	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
 
 	glUniform1f(policebluespot_cutoff, 45);
@@ -856,8 +856,8 @@ void setupHeadLight()
 	glUniform4fv(headrightlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampSource);
 	glUniform4fv(headrightspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampDest);
 
-	glUniform4fv(headrightdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
-	glUniform4fv(headrightspecular_color, 1, vec4(1,.8f,.4f,1));
+	glUniform4fv(headrightdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
+	glUniform4fv(headrightspecular_color, 1, vec4(0.5,.5f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
 	glUniform1f(headrightspot_cutoff, 30);
 	glUniform1f(headrightspot_exponent, 10);
@@ -867,8 +867,10 @@ void setupHeadLight()
 	glUniform4fv(headleftlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampSource);
 	glUniform4fv(headleftspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampDest);
 
-	glUniform4fv(headleftdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
-	glUniform4fv(headleftspecular_color, 1, vec4(1,.8f,.4f,1));
+	//glUniform4fv(headleftdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
+	//glUniform4fv(headleftspecular_color, 1, vec4(1,.8f,.4f,1));
+	glUniform4fv(headleftdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
+	glUniform4fv(headleftspecular_color, 1, vec4(0.5,.8f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
 	glUniform1f(headleftspot_cutoff, 30);
 	glUniform1f(headleftspot_exponent, 10);
@@ -892,23 +894,9 @@ void setupMoonLight()
 /////////////////////////////////////////
 void displayStage(void)
 {
-	/*glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-  
 	
-	glUniform4fv(vStageAmbientColor,1, stage.ambient);
-	glUniform4fv(vStageDiffuseColor,1, stage.diffuse);
-	glUniform4fv(vStageSpecularColor,1, stage.specular);
-	glUniform1i(vStageShininess, stage.shininess);
-
-	DrawTriagle(stagevao, 36);
-
-	stack.push(mv);*/
-
-		//mv = mv * Translate(0, 10,0);
-		//mv = mv * RotateX(90);
-
 	glVertexAttrib4fv(vStageAmbientDiffuseColor, vec4(.5, 0.5, 0.5, 1));
-	glVertexAttrib4fv(vStageSpecularColor, vec4(0.5f,0.5f,1.0f,1.0f));
+	glVertexAttrib4fv(vStageSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vStageSpecularExponent, 10.0);
 
 	glBindVertexArray( stagevao[0] );
@@ -924,11 +912,10 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(0.8, -0.9, 0.8); // 0.05
-	//mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
 	mv = mv * Scale(0.2,0.2,0.2);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(0, 1.0, 1.0, 1));
-	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
 	DrawTriagle(simpleObjvao, totalsimpleobjverts);
@@ -940,11 +927,10 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(-0.8, -0.9, 0.8); // 0.05
-	//mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
 	mv = mv * Scale(0.2,0.2,0.2);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1, 0.0, .5, 1));
-	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
 	DrawTriagle(simpleObjvao, totalsimpleobjverts);
@@ -968,7 +954,7 @@ void displayHead()
 	mv = mv * Scale(0.02,0.02,0.02);
 	
 	glVertexAttrib4fv(vHeadAmbientDiffuseColor, vec4(0, 0, 0.0, 1));
-	glVertexAttrib4fv(vHeadSpecularColor, vec4(0.5f,1.0f,1.0f,1.0f));
+	glVertexAttrib4fv(vHeadSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vHeadSpecularExponent, 10.0);
 
 	DrawTriagle(headvao, totalheadverts);
@@ -1039,8 +1025,8 @@ void displayCar(void)
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
-	glVertexAttrib4fv(vCarSpecularColor, vec4(1.0f, 1.0f,0.0f,1.0f));
-	glVertexAttrib1f(vCarSpecularExponent, 10.0);
+	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 1.0);
 
 
 	DrawTriagle(carvao, 36);
@@ -1058,29 +1044,11 @@ void DrawWheels(GLuint wheelside1vao[1],
 {
 	
 	
-	/*glUniform4fv(vWheelSide1AmbientColor,1, wheelside.ambient);
-	glUniform4fv(vWheelSide1DiffuseColor,1, wheelside.diffuse);
-	glUniform4fv(vWheelSide1SpecularColor,1, wheelside.specular);
-	glUniform1i(vWheelSide1Shininess, wheelside.shininess);*/
-
+	
 	DrawTriagle(wheelside1vao, sidecount);
 
-	/*glUniform4fv(vWheelSide2AmbientColor,1, wheelside.ambient);
-	glUniform4fv(vWheelSide2DiffuseColor,1, wheelside.diffuse);
-	glUniform4fv(vWheelSide2SpecularColor,1, wheelside.specular);
-	glUniform1i(vWheelSide2Shininess, wheelside.shininess);*/
-
 	DrawTriagle(wheelside2vao, sidecount);
-	
-	
-	// draw cylinder
-
-	/*glUniform4fv(vWheelCylinderAmbientColor,1, cylinder.ambient);
-	glUniform4fv(vWheelCylinderDiffuseColor,1, cylinder.diffuse);
-	glUniform4fv(vWheelCylinderSpecularColor,1, cylinder.specular);
-	glUniform1i(vWheelCylinderShininess, cylinder.shininess);
-*/
-	
+			
 	DrawTriagle(cylindervao, cylindercount);
 
 }
@@ -1109,8 +1077,8 @@ void displayWheels()
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
-	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
-	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
 	
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
@@ -1136,8 +1104,8 @@ void displayWheels()
 	mv = mv * Scale(0.025,0.007,0.025);
 
 	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
-	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
-	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 
@@ -1160,8 +1128,8 @@ void displayWheels()
 	mv = mv * Scale(0.025,0.007,0.025);
 
 	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
-	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
-	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 	
@@ -1183,8 +1151,8 @@ void displayWheels()
 	mv = mv * Scale(0.025,0.007,0.025);
 		
 	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
-	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(1.0f, 0.0f,.0f,1.0f));
-	glVertexAttrib1f(vWheelSide1SpecularExponent, 10.0);
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
+	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 		 
@@ -1210,13 +1178,7 @@ void displayPoliceLamps()
 	
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
-
-	//mv = mv * Translate(0, 0, 0.05);
-	
-	//mv = mv * Translate(0, 0.034, 0.015);
-	// mv = mv * RotateY(turnEyeAngle);
 	mv = mv * Translate(0.015, -0.905, 0.05); // -0.905
-	//mv = mv * Translate(0.006, -0.905, 0.07);
 	mv = mv * RotateY(turnPoliceLampAngle);
 	mv = mv * RotateX(-90);
 	mv = mv * Scale(0.010f,0.040f,0.040f);
@@ -1224,10 +1186,9 @@ void displayPoliceLamps()
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1.0f, 0.0f, 0.0f, 1));
-	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(1.0f, 0.0f,0.0f,1.0f));
-	glVertexAttrib1f(vPoliceRedSpecularExponent, 10.0);
-
-	
+	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f, 0.0f,0.0f,1.0f));
+	glVertexAttrib1f(vPoliceRedSpecularExponent, 1.0);
+		
 
 	DrawTriagle(policeredvao, 144);
 
@@ -1239,24 +1200,17 @@ void displayPoliceLamps()
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
 
-	//mv = mv * Translate(0, 0, 0.05);
 	
-	//mv = mv * Translate(0, 0.034, 0.015);
-	// mv = mv * RotateY(turnEyeAngle);
 	mv = mv * Translate(-0.015, -0.905, 0.05); // -0.905
-	//mv = mv * Translate(0.006, -0.905, 0.07);
+	
 	mv = mv * RotateY(turnPoliceLampAngle);
 	mv = mv * RotateX(-90);
 	mv = mv * Scale(0.010f,0.040f,0.040f);
 
 	glVertexAttrib4fv(vPoliceBlueAmbientDiffuseColor, vec4(0.0f, 0.0f, 1.0f, 1));
 	glVertexAttrib4fv(vPoliceBlueSpecularColor, vec4(0.0f, 0.0f,1.0f,1.0f));
-	glVertexAttrib1f(vPoliceBlueSpecularExponent, 10.0);
+	glVertexAttrib1f(vPoliceBlueSpecularExponent, 1.0);
 
-	if ( turnOnPoliceLight == true )
-		glVertexAttrib1d(policeBlueOn, 1);
-	else
-		glVertexAttrib1d(policeBlueOn, 0);
 
 	DrawTriagle(policebluevao, 144);
 
@@ -1759,11 +1713,11 @@ void myIdle()
 				currentZ = currentZ + moveStepZ;
 
 			
-				policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-				policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
+				policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+				policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
 
-				policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
+				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);
 
 				if ( currentX < -1.0 )
 				{
@@ -1806,11 +1760,11 @@ void myIdle()
 				currentZ = currentZ - moveStepZ;
 
 
-				policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-				policeredlightlampDest   = vec4(0.015, -0.905, -5,0);
+				policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+				policeredlightlampDest   = vec4(0.015, -0.8, -5,0);
 
-				policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.905, 5,0);
+				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);
 
 				if ( currentX < -1.0 )
 				{
@@ -2069,7 +2023,7 @@ void mouse(int button, int state, int x, int y) {
 void init() {
 
   /*select clearing (background) color*/
-  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
 
   
     turnPoliceLampAngle = 0;
@@ -2121,11 +2075,11 @@ void init() {
   leftlampSource = vec4(leftlampSource.x,-0.97,leftlampSource.z,1); 
   leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
 
-  policeredlightlampSource = vec4(0.015, -0.905, 0.05, 1);
-  policeredlightlampDest   = vec4(0.015, -0.905, -5, 0);
+  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+  policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
 
-  policebluelightlampSource = vec4(-0.015, -0.905, 0.05, 1);
-  policebluelightlampDest   = vec4(-0.015, -0.905, 5, 0);
+  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+  policebluelightlampDest   = vec4(-0.015, -0.8, 5, 0);
 
   turnCarAngle = 0;
   turnAngle = 0;
