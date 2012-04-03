@@ -1,10 +1,13 @@
 #version 150
+#define NUM_LIGHTS 5
 in vec3 position;
 in vec3 vN;
 
 in vec4 AmbientDiffuseColor;
 in vec4 SpecularColor;
 in float SpecularExponent;
+in vec4 IsOn;
+
 
 uniform vec4 light_position;
 uniform vec4 light_color;
@@ -22,10 +25,11 @@ struct lightSource
 	float constantAttenuation, linearAttenuation, quadraticAttenuation;
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
 	vec4 spot_direction;
+	
 };
-const int numberofLightSources = 5;
-uniform lightSource lights[numberofLightSources];
 
+uniform lightSource lights[NUM_LIGHTS];
+flat in int lightOn[NUM_LIGHTS];
 vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
 struct material
 {
@@ -41,15 +45,18 @@ out vec4  fColor;
 void main()
 {
 	
-
 	vec4 amb = AmbientDiffuseColor * ambient_light;
 	float  attenuation = 1;
 
 	vec4 final_color = amb;
 	vec3 L;
 
-	for ( int index = 0; index < numberofLightSources;index++)
+	for ( int index = 0; index < NUM_LIGHTS;index++)
 	{
+		if (lightOn[index] == 0 )
+		{
+			continue;
+		}
 				
 		if ( lights[index].position.w == 0 ) // directional light
 		{
