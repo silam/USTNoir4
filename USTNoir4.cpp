@@ -987,7 +987,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(0.8, -0.9, 0.8); // 0.05
-	mv = mv * Scale(0.2,0.2,0.2);
+	mv = mv * Scale(0.2,0.9,0.2);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(0, 1.0, 1.0, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1002,7 +1002,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(-0.8, -0.9, 0.8); // 0.05
-	mv = mv * Scale(0.2,0.2,0.2);
+	mv = mv * Scale(0.5,0.2,0.2);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1, 0.0, .5, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1017,7 +1017,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(-0.8, -0.9, -0.8); // 0.05
-	mv = mv * Scale(0.2,0.2,0.2);
+	mv = mv * Scale(0.2,0.2,0.5);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(0.0, 1.0, .5, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1032,7 +1032,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(0.8, -0.9, -0.8); // 0.05
-	mv = mv * Scale(0.2,0.2,0.2);
+	mv = mv * Scale(0.5,0.2,0.5);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1.0, 0.0, 1.0, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
