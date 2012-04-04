@@ -45,11 +45,14 @@ out vec4  fColor;
 void main()
 {
 	
-	vec4 amb = AmbientDiffuseColor * ambient_light;
+	vec4 globalamb = AmbientDiffuseColor * scene_ambient;
 	float  attenuation = 1;
 
-	vec4 final_color = amb;
+	vec4 final_color = globalamb;
 	vec3 L;
+	
+	vec3 E = normalize(-position.xyz);
+	vec3 N = normalize(vN);
 
 	for ( int index = 0; index < NUM_LIGHTS;index++)
 	{
@@ -60,42 +63,49 @@ void main()
 				
 		if ( lights[index].position.w == 0 ) // directional light
 		{
-			attenuation = 1;
-			L = normalize( lights[index].position.xyz - position.xyz);
+			//attenuation = 1;
+			L = normalize( lights[index].position.xyz); // - position.xyz);
+			
+			vec3 H = normalize(L+E);
+
+			vec4 diff = clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
+
+			vec4 spec = pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
+	
+			if(dot(L,N) < 0.0){
+				spec = vec4(0,0,0,1);
+			}
+	
+			final_color +=  diff + spec;
 		}
 		else // spot light
 		{
 			L = normalize( lights[index].position.xyz - position.xyz);
-		
+				
 			if ( lights[index].spot_cutoff <= 90.0) // spotlight?
 			{
 					  float clampedCosine = max(0.0, dot(-L, normalize(lights[index].spot_direction.xyz)));
-					  if (clampedCosine > cos(radians(lights[index].spot_cutoff))) // outside of spotlight cone?
+					  if (clampedCosine < cos(radians(lights[index].spot_cutoff))) // outside of spotlight cone?
 					  {
-						  attenuation = 0;
-					  }
-					  else
-					  {
-						  attenuation = 1; // attenuation * pow(clampedCosine, 50);   
+						     					  
+						    //attenuation = 1;// attenuation * pow(clampedCosine, 1);   
+						    
+							vec3 H = normalize(L+E);
+
+							vec4 diff = attenuation*clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
+
+							vec4 spec = attenuation*pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
+	
+							if(dot(L,N) < 0.0){
+								spec = vec4(0,0,0,1);
+							}
+	
+							final_color +=  diff + spec;
 					  }
 			}
 	
 		}
 
-		vec3 E = normalize(-position.xyz);
-		vec3 N = normalize(vN);
-
-		vec3 H = normalize(L+E);
-
-		vec4 diff = attenuation*clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
-
-		vec4 spec = attenuation*pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
-	
-		if(dot(L,N) < 0.0){
-			spec = vec4(0,0,0,1);
-		}
-	
-		final_color += amb + diff + spec;
 	}
 	fColor = final_color;
 }

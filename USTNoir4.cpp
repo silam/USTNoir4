@@ -288,7 +288,6 @@ GLuint moonlight_position;
 //GLuint moonlight_color;
 GLuint moondiffuse_color;
 GLuint moonspecular_color;
-GLuint moonlightOn;
 GLuint moonambient_light;
 GLboolean ismoonOn;
 
@@ -863,9 +862,9 @@ void generatePoliceLamp()
 		
 		vec3 normal = normalize(cross(c-b, a -b));
 
-		policeLampRedNormals[point-3] = normal;
-		policeLampRedNormals[point-2] = normal;
-		policeLampRedNormals[point-1] = normal;
+		policeLampRedNormals[point-3] = vec3(0.0, 0.0, -1.0);
+		policeLampRedNormals[point-2] = vec3(0.0, 0.0, -1.0);
+		policeLampRedNormals[point-1] = vec3(0.0, 0.0, -1.0);
 	}
 
 	
@@ -881,9 +880,9 @@ void generatePoliceLamp()
 		
 		vec3 normal = normalize(cross(c-b, a -b));
 
-		policeLampBlueNormals[point-3] = normal;
-		policeLampBlueNormals[point-2] = normal;
-		policeLampBlueNormals[point-1] = normal;
+		policeLampBlueNormals[point-3] = vec3(0.0, 0.0, 1.0);
+		policeLampBlueNormals[point-2] = vec3(0.0, 0.0, 1.0);
+		policeLampBlueNormals[point-1] = vec3(0.0, 0.0, 1.0);
 	}
 
 	
@@ -895,28 +894,36 @@ void generatePoliceLamp()
 //////////////////////////////////////////
 void setupPoliceLight()
 {
-	
-	glUniform4fv(policeredlight_position, 1, mv*Translate(currentX, 0, currentZ)*policeredlightlampSource); 
-	glUniform4fv(policeredspot_direction, 1, mv*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
+	//glUniform4fv(headrightlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampSource);
+	//glUniform4fv(headrightspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampDest);
+
+	/*
+	glUniform4fv(headrightdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
+	glUniform4fv(headrightspecular_color, 1, vec4(0.4,.4f,.4f,1));
+	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+	*/
+
+	glUniform4fv(policeredlight_position, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*policeredlightlampSource); 
+	glUniform4fv(policeredspot_direction, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
 		
-	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f,0.0f,.0f,1));
-	glUniform4fv(policeredspecular_color, 1, vec4(0.0f,0.0f,.0f,1));
+	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f, 0.0f,0.0f,1));
+	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,1.0f,1.0f,1));
 	glUniform4fv(policeredambient_light,  1, vec4(0.2, 0.2, 0.2, 1));
 
-	glUniform1f(policeredspot_cutoff, 45);
+	glUniform1f(policeredspot_cutoff, 30);
 	glUniform1f(policeredspot_exponent, 120);
 	
 
 	// blue light
 
-	glUniform4fv(policebluelight_position, 1, mv*Translate(currentX, 0, currentZ)*policebluelightlampSource); 
-	glUniform4fv(policebluespot_direction, 1, mv*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
+	glUniform4fv(policebluelight_position, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*policebluelightlampSource); 
+	glUniform4fv(policebluespot_direction, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policebluelightlampDest);
 		
 	glUniform4fv(policebluediffuse_color,  1, vec4(0.0f,0.0f,1.0f,1));
-	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,0.0f,1));
+	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
 
-	glUniform1f(policebluespot_cutoff, 45);
+	glUniform1f(policebluespot_cutoff, 30);
 	glUniform1f(policebluespot_exponent, 120);
 	glUniform1i(policeBlueOn, 1);
 	
@@ -934,7 +941,7 @@ void setupHeadLight()
 	glUniform4fv(headrightdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
 	glUniform4fv(headrightspecular_color, 1, vec4(0.4,.4f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
-	glUniform1f(headrightspot_cutoff, 30);
+	glUniform1f(headrightspot_cutoff, 60);
 	glUniform1f(headrightspot_exponent, 10);
 	glUniform1i(headrightOn, 1);
 
@@ -947,7 +954,7 @@ void setupHeadLight()
 	glUniform4fv(headleftdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
 	glUniform4fv(headleftspecular_color, 1, vec4(0.4,.4f,.4f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
-	glUniform1f(headleftspot_cutoff, 30);
+	glUniform1f(headleftspot_cutoff, 60);
 	glUniform1f(headleftspot_exponent, 10);
 	glUniform1i(headleftOn, 1);
 
@@ -962,7 +969,7 @@ void setupMoonLight()
 	glUniform4fv(moondiffuse_color, 1, vec4(0.8,.8f,.4f,1));
 	glUniform4fv(moonspecular_color, 1, vec4(0.4,.4f,.4f,1));
 	glUniform4fv(moonambient_light, 1, vec4(.2, .2, .2, 1));
-	glUniform1i(moonlightOn, 1);	
+		
 }
 /////////////////////////////////////////
 // displayStage
@@ -1274,12 +1281,12 @@ void displayWheels()
 
 
 }
+//////////////////////////////////////////
+// police lamp
+//////////////////////////////////////////
+	
 void displayPoliceLamps()
 {
-	//////////////////////////////////////////
-	// police lamp
-	//////////////////////////////////////////
-	
 	
 	if ( turnOnPoliceLight == true )
 		glVertexAttrib4fv(vPoliceIsOn, lightOn);
@@ -1848,11 +1855,17 @@ void myIdle()
 				currentZ = currentZ + moveStepZ;
 
 			
-				policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
-				policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
+				//policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+				//policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
+
+				//policeredlightlampSource = vec4(0.0, -0.0, 0.00, 1);
+				//policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
+
+				/* policeredlightlampSource = rightlampSource;
+				 policeredlightlampDest   = rightlampDest;  
 
 				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);
+				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);*/
 
 				if ( currentX < -1.0 )
 				{
@@ -1895,11 +1908,14 @@ void myIdle()
 				currentZ = currentZ - moveStepZ;
 
 
-				policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
-				policeredlightlampDest   = vec4(0.015, -0.8, -5,0);
+				//= policeredlightlampSource = vec4(0.0, -0.0, 0.00, 1);; //vec4(0.015, -0.8, 0.05, 1);
+				//liceredlightlampDest   = vec4(0.015, -0.8, -5,0);
+
+				 /*policeredlightlampSource = rightlampSource;
+				 policeredlightlampDest   = rightlampDest;  
 
 				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);
+				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);*/
 
 				if ( currentX < -1.0 )
 				{
@@ -1973,12 +1989,12 @@ void Keyboard(unsigned char key, int x, int y) {
 	{
 		if ( switchcamera == 0 )
 		{
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 1;
 		}
 		else if ( switchcamera == 1 )
 		{
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 2;
 		}
 		else if ( switchcamera == 2 )
@@ -2009,7 +2025,7 @@ void Keyboard(unsigned char key, int x, int y) {
 			reshape(ww, wh);
 		}
 		else
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 			
 	}
 	else if (key == 'a' || key == 'A' ) // to zoom in
@@ -2022,7 +2038,7 @@ void Keyboard(unsigned char key, int x, int y) {
 		}
 		else
 		{
-			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 		}
 	}
 	else if (key == 'w' || key == 'W' ) // dolly in
@@ -2173,7 +2189,7 @@ void init() {
 	  rightlampSource.x = -0.02;
 	  rightlampDest.x	= -0.04;
 	  rightlampSource.z = 0.2;
-	  rightlampDest.z = 1.0;
+	  rightlampDest.z = 0.27;
 
 	  rightlampSource = vec4(rightlampSource.x,-0.97,rightlampSource.z,1); 
 	  rightlampDest   = vec4(rightlampDest.x,  -1,rightlampDest.z,  0); 
@@ -2182,16 +2198,19 @@ void init() {
 	  leftlampSource.x	= 0.02;
 	  leftlampDest.x	= 0.04;
 	  leftlampSource.z = 0.2;
-	  leftlampDest.z = 1.0;
+	  leftlampDest.z = 0.27;
   
 	  leftlampSource = vec4(leftlampSource.x,-0.97,leftlampSource.z,1); 
 	  leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
 
-	  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
-	  policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
+	  /////////////////////////////////////////
+	  // police light coordinates x,y,z
+	  /////////////////////////////////////////
+	  policeredlightlampSource = vec4(-0.015, -0.9, 0.05, 1);
+	  policeredlightlampDest   = vec4(-0.015, -0.9,    -2, 0);
 
-	  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-	  policebluelightlampDest   = vec4(-0.015, -0.8, 5, 0);
+	  policebluelightlampSource = vec4(0.015, -0.9, 0.05, 1);
+	  policebluelightlampDest   = vec4(0.015, -0.9,   2, 0);
 
 	  turnCarAngle = 0;
 	  turnAngle = 0;
