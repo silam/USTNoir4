@@ -85,7 +85,7 @@ void main()
 			if ( lights[index].spot_cutoff <= 90.0) // spotlight?
 			{
 					  float clampedCosine = max(0.0, dot(-L, normalize(lights[index].spot_direction.xyz)));
-					  if (clampedCosine < cos(radians(lights[index].spot_cutoff))) // outside of spotlight cone?
+					  if (clampedCosine > cos(radians(lights[index].spot_cutoff))) // outside of spotlight cone?
 					  {
 						     					  
 						    //attenuation = 1;// attenuation * pow(clampedCosine, 1);   
