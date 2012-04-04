@@ -910,7 +910,7 @@ void setupPoliceLight()
 	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,1.0f,1.0f,1));
 	glUniform4fv(policeredambient_light,  1, vec4(0.2, 0.2, 0.2, 1));
 
-	glUniform1f(policeredspot_cutoff, 30);
+	glUniform1f(policeredspot_cutoff, 45);
 	glUniform1f(policeredspot_exponent, 120);
 	
 
@@ -923,7 +923,7 @@ void setupPoliceLight()
 	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
 
-	glUniform1f(policebluespot_cutoff, 30);
+	glUniform1f(policebluespot_cutoff, 45);
 	glUniform1f(policebluespot_exponent, 120);
 	glUniform1i(policeBlueOn, 1);
 	
@@ -949,8 +949,7 @@ void setupHeadLight()
 	glUniform4fv(headleftlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampSource);
 	glUniform4fv(headleftspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampDest);
 
-	//glUniform4fv(headleftdiffuse_color, 1, vec4(0.8,.8f,.4f,1));
-	//glUniform4fv(headleftspecular_color, 1, vec4(1,.8f,.4f,1));
+
 	glUniform4fv(headleftdiffuse_color, 1, vec4(1.0f,1.0f,1.0f,1));
 	glUniform4fv(headleftspecular_color, 1, vec4(1.0,1.0f,1.0f,1));
 	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
