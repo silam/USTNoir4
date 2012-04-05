@@ -341,7 +341,7 @@ struct lightSource
 };
 
 lightSource directionalLight, spotLightHeadLamp;
-const int numberofLightSources = 2;
+const int numberofLightSources = 5;
 lightSource lights[numberofLightSources];
 
 //////////////////////////////
@@ -546,10 +546,7 @@ void generateCar(){
 
 
 	int index = 0;
-	//for(int i=0; i<6; i++){
-	//	carColors[i] = vec4(0.0, 1.0, 1.0, 1.0); //front
-	//}
-	//
+
 	carVerts[0] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[1] = vec4( 0.05f,  0.05f, 0.05f, 1.0);
 	carVerts[2] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
@@ -572,9 +569,7 @@ void generateCar(){
 	carNormals[index++] = normal; 
 
 
-	//for(int i=6; i<12; i++){
-	//	carColors[i] = vec4(1.0, 0.0, 1.0, 1.0); //back
-	//}
+	
 	carVerts[6] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[7] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[8] = vec4(0.05f, 0.05f, -0.05f, 1.0);
@@ -597,9 +592,6 @@ void generateCar(){
 	carNormals[index++] = normal; 
 
 
-	//for(int i=12; i<18; i++){
-	//	carColors[i] = vec4(1.0, 1.0, 0.0, 1.0); //left
-	//}
 	carVerts[12] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	carVerts[13] = vec4(0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[14] = vec4(0.05f, -0.05f, -0.05f, 1.0);
@@ -622,9 +614,7 @@ void generateCar(){
 	carNormals[index++] = -normal; 
 
 
-	//for(int i=18; i<24; i++){
-	//	carColors[i] = vec4(1.0, 0.0, 0.0, 1.0); //right
-	//}
+	
 	carVerts[18] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[19] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[20] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
@@ -646,10 +636,7 @@ void generateCar(){
 	carNormals[index++] = -normal; 
 	carNormals[index++] = -normal; 
 
-
-	//for(int i=24; i<30; i++){
-	//	carColors[i] = vec4(0.0, 0.0, 1.0, 1.0); //top
-	//}
+		
 	carVerts[24] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	carVerts[25] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[26] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
@@ -738,13 +725,10 @@ void generateWheelSides()
 	{
 		point4 a = wheelSide2Verts[point++] = vec4(0.0f,		side*(-1.0f), 0.0f, 1.0); 
 		
-
 		point4 b = wheelSide2Verts[point++] = vec4(cos(angle*M_PI/180), side*(-1.0f), -sin(angle*M_PI/180), 1.0); 
-		//wheelside2Colors[point] = vec4(0.5f,0.5f,0.5f, 1.0); 
-
+		
 		point4 c = wheelSide2Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
-		//wheelside2Colors[point] = vec4(0.5f ,0.5f,0.5f, 1.0); 
-
+		
 		vec3 normal = normalize(cross(c-b, a -b));
 
 		wheelSide2Normals[point-3] = normal;
@@ -793,55 +777,7 @@ void DrawTriagle(GLuint vao[], int count)
 	glDrawArrays( GL_TRIANGLES, 0, count );
 }
 
-//In this particular case, our normal vectors and vertex vectors are identical since the sphere is centered at the origin
-//For most objects this won't be the case, so I'm treating them as separate values for that reason
-//This could also be done as separate triangle strips, but I've chosen to make them just triangles so I don't have to execute multiple glDrawArrays() commands
-int generateSphere(float radius, int subdiv){
-	float step = (360.0/subdiv)*(M_PI/180.0);
 
-	int totalverts = ceil(subdiv/2.0)*subdiv * 6;
-
-	if(sphere_normals){
-		delete[] sphere_normals;
-	}
-	sphere_normals = new vec3[totalverts];
-	if(sphere_verts){
-		delete[] sphere_verts;
-	}
-	sphere_verts = new vec4[totalverts];
-
-	int k = 0;
-	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
-		for(float j = -M_PI; j<=M_PI; j+=step){
-			//triangle 1
-			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
-			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			k++;
-	
-			sphere_normals[k]= vec3(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step));
-			sphere_verts[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
-			k++;
-			
-			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
-			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			k++;
-
-			//triangle 2
-			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
-			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			k++;
-
-			sphere_normals[k]= vec3(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i));
-			sphere_verts[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
-			k++;
-
-			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
-			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			k++;
-		}
-	}
-	return totalverts;
-}
 /////////////////////////////////////////
 //generatePoliceLamp
 /////////////////////////////////////////
@@ -899,15 +835,7 @@ void generatePoliceLamp()
 //////////////////////////////////////////
 void setupPoliceLight()
 {
-	//glUniform4fv(headrightlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampSource);
-	//glUniform4fv(headrightspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*rightlampDest);
-
-	/*
-	glUniform4fv(headrightdiffuse_color, 1, vec4(0.5,.5f,.5f,1));
-	glUniform4fv(headrightspecular_color, 1, vec4(0.4,.4f,.4f,1));
-	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
-	*/
-
+	// police red light
 	glUniform4fv(policeredlight_position, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*policeredlightlampSource); 
 	glUniform4fv(policeredspot_direction, 1, mv*Translate(currentX, 0, currentZ)*RotateY(turnCarAngle)*RotateY(turnPoliceLampAngle)*policeredlightlampDest);
 		
@@ -1128,6 +1056,9 @@ void displayHead()
 
 	mv = stack.pop();
 
+	// left police head lamp
+
+
 
 }
 
@@ -1171,8 +1102,8 @@ void displayCar(void)
 	
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
-	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
-	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(0.2f, 0.2f, 0.2f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(0.2f, 0.2f,0.2f,1.0f));
 	glVertexAttrib1f(vCarSpecularExponent, 1.0);
 
 
@@ -1441,7 +1372,7 @@ void setupShader(GLuint prog){
 	
 	
 	glUseProgram( prog );
-	//glLinkProgram( prog);
+
 	model_view = glGetUniformLocation(prog, "model_view");
 	projection = glGetUniformLocation(prog, "projection");
 	
@@ -1983,8 +1914,8 @@ void mouse_dragged(int x, int y) {
   glutPostRedisplay();
 }
 
-/////////////////////////////////////////////
-// mouse
+////////////////////////////////////////////
+// This is for me for testing the scene
 ///////////////////////////////////////////
 void mouse(int button, int state, int x, int y) {
   //establish point of reference for dragging mouse in window
@@ -2039,31 +1970,21 @@ void init() {
 	  currentX = currentZ = 0;
 
 	  // right lamp
-	  rightlampSource.x = -0.02;
-	  rightlampDest.x	= -0.04;
-	  rightlampSource.z = 0.2;
-	  rightlampDest.z = 0.27;
+	  rightlampSource = vec4(-0.02,-0.97,0.20,1); 
+	  rightlampDest   = vec4(-0.04,-1   ,0.27,  0); 
 
-	  rightlampSource = vec4(rightlampSource.x,-0.97,rightlampSource.z,1); 
-	  rightlampDest   = vec4(rightlampDest.x,  -1,rightlampDest.z,  0); 
-
-	  // left lamp
-	  leftlampSource.x	= 0.02;
-	  leftlampDest.x	= 0.04;
-	  leftlampSource.z = 0.2;
-	  leftlampDest.z = 0.27;
-  
-	  leftlampSource = vec4(leftlampSource.x,-0.97,leftlampSource.z,1); 
-	  leftlampDest   = vec4(leftlampDest.x,  -1,leftlampDest.z,  0); 
+	   
+	  leftlampSource = vec4(0.02,-0.97,0.20,1); 
+	  leftlampDest   = vec4(0.04,-1   ,0.27,  0); 
 
 	  /////////////////////////////////////////
 	  // police light coordinates x,y,z
 	  /////////////////////////////////////////
-	  policeredlightlampSource = vec4(0.015, -0.84, -0.07, 1);
+	  policeredlightlampSource = vec4(0.015, -0.8, -0.07, 1);
 	  policeredlightlampDest   = vec4(0.015, -0.8,    -2, 0);
 
-	  policebluelightlampSource = vec4(-0.015, -0.84,-0.07, 1);
-	  policebluelightlampDest   = vec4(-0.015, -0.8l,   2, 0);
+	  policebluelightlampSource = vec4(-0.015, -0.8,-0.07, 1);
+	  policebluelightlampDest   = vec4(-0.015, -0.8,   2, 0);
 
 	  turnCarAngle = 0;
 	  turnAngle = 0;
