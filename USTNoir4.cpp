@@ -1,7 +1,6 @@
 /*
- *Skeleton lighting program
- *COS490
- *Fall 2011
+ UST Noir
+ Si Lam
  **/
 
 #include <GL/Angel.h>
@@ -50,10 +49,10 @@ GLboolean startcar;
 ////////////////////////////////
 // police light variables
 ////////////////////////////////
-GLuint policeredvao[1];
-GLuint policeredvbo[2];
-GLuint policebluevao[1];
-GLuint policebluevbo[2];
+GLuint * policeredvao;
+GLuint * policeredvbo;
+GLuint * policebluevao;
+GLuint * policebluevbo;
 GLfloat turnPoliceLampAngle;
 GLboolean turnOnPoliceLight;
 vec4 policeredlightlampSource;
@@ -64,8 +63,8 @@ vec4 policebluelightlampDest;
 ////////////////////////////////
 // simple objects variables
 ////////////////////////////////
-GLuint simpleObjvao[1];
-GLuint simpleObjvbo[2];
+GLuint * simpleObjvao;
+GLuint * simpleObjvbo;
 vec4* simpleObjVers;
 vec3* simpleObjNormals;
 GLint totalsimpleobjverts;
@@ -116,10 +115,10 @@ vec4 leftlampDest;
 /////////////////////////
 // wheel cylinder
 /////////////////////////
-vec4 wheelCylinderVers[414];
-vec4 vWheelCylinderNormals[414];
-GLuint cylindervao[1];
-GLuint cylindervbo[2];
+vec4 * wheelCylinderVers;
+vec3 * vWheelCylinderNormals;
+GLuint * cylindervao;
+GLuint * cylindervbo;
 
 
 int right_button_down = FALSE;
@@ -193,20 +192,17 @@ GLuint vEyeSpecularExponent;
 /////////////////////////
 // wheel side vertices
 /////////////////////////
-vec4 wheelSide1Verts[75];
-vec4 wheelSide1Normals[75];
+vec4 * wheelSide1Verts;
+vec3 * wheelSide1Normals;
 
-vec4 wheelSide2Verts[75];
-vec4 wheelSide2Normals[75];
+vec4 * wheelSide2Verts;
+vec3 * wheelSide2Normals;
 
-vec4 wheelside1Colors[75];
-vec4 wheelside2Colors[75];
+GLuint * wheelside1vao;
+GLuint * wheelside1vbo;
 
-GLuint wheelside1vao[1];
-GLuint wheelside1vbo[2];
-
-GLuint wheelside2vao[1];
-GLuint wheelside2vbo[2];
+GLuint * wheelside2vao;
+GLuint * wheelside2vbo;
 ////////////////////////
 // WHEEEL
 /////////////////////////
@@ -707,6 +703,17 @@ void generateCar(){
 /////////////////////////////////////////
 void generateWheelSides()
 {
+	wheelSide1Verts  = new vec4[75];
+	wheelSide1Normals  = new vec3[75];
+
+	wheelSide2Verts  = new vec4[75];
+	wheelSide2Normals  = new vec3[75];
+
+	wheelCylinderVers  = new vec4[414];
+	vWheelCylinderNormals  = new vec3[414];
+
+	
+
 	int side = 1; // the outer side of the wheel
 	
 	int point = 0;
@@ -1065,7 +1072,7 @@ void displayEye()
 	
 	mv = mv * Translate(0, 0.034, 0.015);
 	mv = mv * RotateY(turnEyeAngle);
-	mv = mv * Translate(0.02, -0.87, 0.01); // -0.905
+	mv = mv * Translate(0.02, -0.92, 0.01); // -0.905
 	
 	mv = mv * RotateX(90);
 	mv = mv * Scale(0.010f,0.010f,0.010f);
@@ -1089,7 +1096,7 @@ void displayEye()
 	mv = mv * Translate(0, 0.034, 0.015);
 	mv = mv * RotateY(turnEyeAngle);
 	//mv = mv * Translate(-0.006, -0.905, 0.01);
-	mv = mv * Translate(-0.02, -0.87, 0.01); // -0.905
+	mv = mv * Translate(-0.02, -0.92, 0.01); // -0.905
 	mv = mv * RotateX(90);
 	mv = mv * Scale(0.010f,0.010f,0.010f);
 
@@ -1112,9 +1119,9 @@ void displayHead()
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
 
-	mv = mv * Translate(0, -0.87, -0.02); // 0.05
+	mv = mv * Translate(0, -0.90, -0.02); // 0.05
 	// mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
-	mv = mv * Scale(0.03,0.07,0.03);
+	mv = mv * Scale(0.03,0.03,0.03);
 	
 	glVertexAttrib4fv(vHeadAmbientDiffuseColor, vec4(1, 1, 1.0, 1));
 	glVertexAttrib4fv(vHeadSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1152,14 +1159,37 @@ void displayCar(void)
 	DrawTriagle(carvao, 36);
 
 	mv = stack.pop();
+
+
+	// upper stage
+
+	stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	 
+	mv = mv * Translate(0, -0.90, -0.08); //-0.0090); 
+	
+	mv = mv * Scale(0.5,1,.5 );
+	
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 1.0);
+
+
+	DrawTriagle(carvao, 36);
+
+	mv = stack.pop();
    
 }
 /////////////////////////////////////////
 // DrawWheels
 /////////////////////////////////////////
-void DrawWheels(GLuint wheelside1vao[1],
-				  GLuint wheelside2vao[2],
-				  GLuint cylindervao[1], 
+void DrawWheels(GLuint * wheelside1vao,
+				  GLuint * wheelside2vao,
+				  GLuint * cylindervao, 
 				  GLsizei sidecount, GLsizei cylindercount)
 {
 	
@@ -1298,7 +1328,7 @@ void displayPoliceLamps()
 	
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
-	mv = mv * Translate(0.015, -0.905, 0.05); // -0.905
+	mv = mv * Translate(0.015, -0.84, -0.07); // -0.905
 	mv = mv * RotateY(turnPoliceLampAngle);
 	mv = mv * RotateX(-90);
 	mv = mv * Scale(0.010f,0.040f,0.040f);
@@ -1321,7 +1351,7 @@ void displayPoliceLamps()
 	mv = mv * RotateY(turnCarAngle);
 
 	
-	mv = mv * Translate(-0.015, -0.905, 0.05); // -0.905
+	mv = mv * Translate(-0.015, -0.84, -0.07); // -0.905
 	
 	mv = mv * RotateY(turnPoliceLampAngle);
 	mv = mv * RotateX(-90);
@@ -1411,21 +1441,7 @@ void display(void)
 
 void setupShader(GLuint prog){
 	
-	// Create a vertex array object
-    //glGenVertexArrays( 1, &vao[0] );
-
-    // Create and initialize any buffer objects
-	//glBindVertexArray( vao[0] );
-	//glGenBuffers( 2, &vbo[0] );
- //   glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
- //   glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
-	//
-
-	////and now our colors for each vertex
-	//glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
-	//glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
-
-
+	
 	glUseProgram( prog );
 	//glLinkProgram( prog);
 	model_view = glGetUniformLocation(prog, "model_view");
@@ -1493,6 +1509,9 @@ void setupShader(GLuint prog){
 
 }
 
+//////////////////////
+// Setup shader for VAO and VBO for each object
+///////////////////////
 void setupShader(GLuint prog, GLuint * vao, GLuint * vbo, vec4 * verts, vec3* normals, int totalcount)
 {
 	// Create a vertex array object
@@ -1560,8 +1579,12 @@ void setupSimpleObjShader(GLuint prog)
 	vSimpleObjSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vSimpleObjSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
-		// Create a vertex array object
-    glGenVertexArrays( 1, &simpleObjvao[0] );
+	simpleObjvao = new GLuint[1];
+	simpleObjvbo = new GLuint[2];
+	setupShader(prog, simpleObjvao, simpleObjvbo, simpleObjVers, simpleObjNormals, totalsimpleobjverts);
+
+	// Create a vertex array object
+    /*glGenVertexArrays( 1, &simpleObjvao[0] );
 	glBindVertexArray( simpleObjvao[0] );
 	glGenBuffers( 2, &simpleObjvbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[0] );
@@ -1579,7 +1602,7 @@ void setupSimpleObjShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 ///////////////////////////////////////////////////
@@ -1626,8 +1649,17 @@ void setupPoliceLightShader(GLuint prog)
 	vPoliceRedSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vPoliceRedSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
+
+
+	policeredvao = new GLuint[1];
+	policeredvbo = new GLuint[2];
+	setupShader(prog, policeredvao, policeredvbo, policeLampRedVerts, policeLampRedNormals, 144);
+
+	
+
+
 	// Create a vertex array object
-    glGenVertexArrays( 1, &policeredvao[0] );
+    /*glGenVertexArrays( 1, &policeredvao[0] );
 	glBindVertexArray( policeredvao[0] );
 	glGenBuffers( 2, &policeredvbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[0] );
@@ -1645,7 +1677,7 @@ void setupPoliceLightShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 
 	// blue
@@ -1653,8 +1685,14 @@ void setupPoliceLightShader(GLuint prog)
 	vPoliceBlueSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vPoliceBlueSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
+
+
+	policebluevao = new GLuint[1];
+	policebluevbo = new GLuint[2];
+	setupShader(prog, policebluevao, policebluevbo, policeLampBlueVerts, policeLampBlueNormals, 144);
+
 	// Create a vertex array object
-    glGenVertexArrays( 1, &policebluevao[0] );
+    /*glGenVertexArrays( 1, &policebluevao[0] );
 	glBindVertexArray( policebluevao[0] );
 
 	glGenBuffers( 2, &policebluevbo[0] );
@@ -1673,7 +1711,7 @@ void setupPoliceLightShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, policebluevbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 ///////////////////////////////////////////////////
@@ -1716,12 +1754,16 @@ void setupEyeShader(GLuint prog)
 void setupWheelShader(GLuint prog)
 {
 	vWheelSide1AmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	
 	vWheelSide1SpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vWheelSide1SpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
+	wheelside1vao = new GLuint[1];
+	wheelside1vbo = new GLuint[2];
+	setupShader(prog, wheelside1vao, wheelside1vbo, wheelSide1Verts, wheelSide1Normals, 75);
+
+
 	// Create a vertex array object
-    glGenVertexArrays( 1, &wheelside1vao[0] );
+    /*glGenVertexArrays( 1, &wheelside1vao[0] );
 	glBindVertexArray( wheelside1vao[0] );
 
 	glGenBuffers( 2, &wheelside1vbo[0] );
@@ -1739,11 +1781,17 @@ void setupWheelShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 
 	// wheelside 2
-	glGenVertexArrays( 1, &wheelside2vao[0] );
+
+	wheelside2vao = new GLuint[1];
+	wheelside2vbo = new GLuint[2];
+	setupShader(prog, wheelside2vao, wheelside2vbo, wheelSide2Verts, wheelSide2Normals, 75);
+
+
+	/*glGenVertexArrays( 1, &wheelside2vao[0] );
 	glBindVertexArray( wheelside2vao[0] );
 
 	glGenBuffers( 2, &wheelside2vbo[0] );
@@ -1761,11 +1809,17 @@ void setupWheelShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 
 	// cylinder
-	glGenVertexArrays( 1, &cylindervao[0] );
+
+	cylindervao = new GLuint[1];
+	cylindervbo = new GLuint[2];
+	setupShader(prog, cylindervao, cylindervbo, wheelCylinderVers, vWheelCylinderNormals, 414);
+
+
+	/*glGenVertexArrays( 1, &cylindervao[0] );
 	glBindVertexArray( cylindervao[0] );
 
 	glGenBuffers( 2, &cylindervbo[0] );
@@ -1783,7 +1837,7 @@ void setupWheelShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 
 }
@@ -2216,10 +2270,10 @@ void init() {
 	  /////////////////////////////////////////
 	  // police light coordinates x,y,z
 	  /////////////////////////////////////////
-	  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+	  policeredlightlampSource = vec4(0.015, -0.84, -0.07, 1);
 	  policeredlightlampDest   = vec4(0.015, -0.8,    -2, 0);
 
-	  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+	  policebluelightlampSource = vec4(-0.015, -0.84,-0.07, 1);
 	  policebluelightlampDest   = vec4(-0.015, -0.8l,   2, 0);
 
 	  turnCarAngle = 0;
@@ -2370,7 +2424,6 @@ int main(int argc, char **argv)
 	  glutKeyboardFunc(Keyboard);
 	  glutSpecialFunc(special);
 	  glutReshapeFunc(reshape);
-	  //glutIdleFunc(idle);
 	  glutMouseFunc(mouse);
 	  glutMotionFunc(mouse_dragged);
 
