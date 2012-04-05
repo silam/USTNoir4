@@ -74,8 +74,8 @@ GLint totalsimpleobjverts;
 ////////////////////////////////
 // driver head variables
 ////////////////////////////////
-GLuint headvao[1];
-GLuint headvbo[2];
+GLuint * headvao;
+GLuint * headvbo;
 vec4* headVers;
 vec3* headNormals;
 GLint totalheadverts;
@@ -86,8 +86,8 @@ GLuint vHeadSpecularExponent;
 ////////////////////////////////
 // car variables
 ////////////////////////////////
-GLuint carvao[1];
-GLuint carvbo[2];
+GLuint * carvao;
+GLuint * carvbo;
 
 //////////////////////////////////////////////////
 // // turn the wheel left/right angle
@@ -99,8 +99,8 @@ GLfloat maxTurnWheel = 45.00f;
 ////////////////////////////////
 // stage variables
 ////////////////////////////////
-GLuint stagevao[1];
-GLuint stagevbo[2];
+GLuint * stagevao;
+GLuint * stagevbo;
 
 
 
@@ -182,10 +182,10 @@ GLuint vNormal;
 /////////////////////////
 // eye
 /////////////////////////
-vec4 eyeVerts[75];
-vec4 eyeNormals[75];
-GLuint eyevao[1];
-GLuint eyevbo[2];
+vec4 * eyeVerts;
+vec3 * eyeNormals;
+GLuint * eyevao;
+GLuint * eyevbo;
 GLuint vEyeAmbientDiffuseColor;
 GLuint vEyeSpecularColor;
 GLuint vEyeSpecularExponent;
@@ -382,6 +382,11 @@ void generateEyes()
 		
 	int point = 0;
 	double angleincrement = 15;
+
+	eyeVerts = new vec4[75];
+	eyeNormals = new vec3[75];
+
+
 	for ( double angle = 0; angle <= 360; angle += angleincrement)
 	{
 		eyeNormals[point] = vec3(0,0,1);
@@ -771,10 +776,6 @@ void generateWheelSides()
 		p++;
 
 	}
-
-
-	
-
 	
 }
 /////////////////////////////////////////
@@ -1490,8 +1491,22 @@ void setupShader(GLuint prog){
 	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
-	/*glBindVertexArray( vao[0] );
+}
 
+void setupShader(GLuint prog, GLuint * vao, GLuint * vbo, vec4 * verts, vec3* normals, int totalcount)
+{
+	// Create a vertex array object
+    glGenVertexArrays( 1, &vao[0] );
+	glBindVertexArray( vao[0] );
+	
+	glGenBuffers( 2, &vbo[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+	glBufferData( GL_ARRAY_BUFFER, totalcount*sizeof(vec4), verts, GL_STATIC_DRAW);
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, totalcount*sizeof(vec3), normals, GL_STATIC_DRAW );
+
+
+	glBindVertexArray( vao[0] );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	vPosition = glGetAttribLocation(prog, "vPosition");
 	glEnableVertexAttribArray(vPosition);
@@ -1500,9 +1515,8 @@ void setupShader(GLuint prog){
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
-
 ///////////////////////////////////////////////////
 // setupHeadShader
 //////////////////////////////////////////////////
@@ -1512,8 +1526,12 @@ void setupHeadShader(GLuint prog)
 	vHeadSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vHeadSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
+	headvao = new GLuint[1];
+	headvbo = new GLuint[2];
+	setupShader(prog, headvao, headvbo, headVers, headNormals, totalheadverts);
+
 		// Create a vertex array object
-    glGenVertexArrays( 1, &headvao[0] );
+    /*glGenVertexArrays( 1, &headvao[0] );
 	glBindVertexArray( headvao[0] );
 	glGenBuffers( 2, &headvbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, headvbo[0] );
@@ -1530,8 +1548,8 @@ void setupHeadShader(GLuint prog)
 
 	glBindBuffer( GL_ARRAY_BUFFER, headvbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(vNormal);ll
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);lb*/
 }
 ///////////////////////////////////////////////////
 // setupHeadShader
@@ -1573,8 +1591,13 @@ void setupCarShader(GLuint prog)
 	vCarSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vCarSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
+
+	carvao = new GLuint[1];
+	carvbo = new GLuint[2];
+	setupShader(prog, carvao, carvbo, carVerts, carNormals, 36);
+
 		// Create a vertex array object
-    glGenVertexArrays( 1, &carvao[0] );
+    /*glGenVertexArrays( 1, &carvao[0] );
 	glBindVertexArray( carvao[0] );
 	glGenBuffers( 2, &carvbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, carvbo[0] );
@@ -1592,7 +1615,7 @@ void setupCarShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, carvbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 ///////////////////////////////////////////////////
 // setupPoliceLightShader
@@ -1662,8 +1685,12 @@ void setupEyeShader(GLuint prog)
 	vEyeSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vEyeSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
+	eyevao = new GLuint[1];
+	eyevbo = new GLuint[2];
+	setupShader(prog, eyevao, eyevbo, eyeVerts, eyeNormals, 75);
+
 	// Create a vertex array object
-    glGenVertexArrays( 1, &eyevao[0] );
+    /*glGenVertexArrays( 1, &eyevao[0] );
 	glBindVertexArray( eyevao[0] );
 
 	glGenBuffers( 2, &eyevbo[0] );
@@ -1681,7 +1708,7 @@ void setupEyeShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, eyevbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 ///////////////////////////////////////////////////
 // setupWheelShader
@@ -1760,14 +1787,18 @@ void setupWheelShader(GLuint prog)
 
 
 }
+
 ///////////////////////////////////////////////////
 // setupStageShader
 //////////////////////////////////////////////////
 void setupStageShader(GLuint prog)
 {
-	
+	stagevao = new GLuint[1];
+	stagevbo = new GLuint[2];
+	setupShader(prog, stagevao, stagevbo, stageVerts, stageNormals, 6);
+
 	// Create a vertex array object
-    glGenVertexArrays( 1, &stagevao[0] );
+    /*glGenVertexArrays( 1, &stagevao[0] );
 	glBindVertexArray( stagevao[0] );
 	
 	glGenBuffers( 2, &stagevbo[0] );
@@ -1786,7 +1817,7 @@ void setupStageShader(GLuint prog)
 	glBindBuffer( GL_ARRAY_BUFFER, stagevbo[1] );
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 /////////////////////////////////////////
@@ -1853,18 +1884,7 @@ void myIdle()
 				currentX = currentX + moveStepX;
 				currentZ = currentZ + moveStepZ;
 
-			
-				//policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
-				//policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
-
-				//policeredlightlampSource = vec4(0.0, -0.0, 0.00, 1);
-				//policeredlightlampDest   = vec4(0.015, -0.8, -5, 0);
-
-				/* policeredlightlampSource = rightlampSource;
-				 policeredlightlampDest   = rightlampDest;  
-
-				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);*/
+						
 
 				if ( currentX < -1.0 )
 				{
@@ -1906,15 +1926,6 @@ void myIdle()
 				currentX = currentX - moveStepX;
 				currentZ = currentZ - moveStepZ;
 
-
-				//= policeredlightlampSource = vec4(0.0, -0.0, 0.00, 1);; //vec4(0.015, -0.8, 0.05, 1);
-				//liceredlightlampDest   = vec4(0.015, -0.8, -5,0);
-
-				 /*policeredlightlampSource = rightlampSource;
-				 policeredlightlampDest   = rightlampDest;  
-
-				policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
-				policebluelightlampDest   = vec4(-0.015, -0.8, 5,0);*/
 
 				if ( currentX < -1.0 )
 				{
@@ -2205,11 +2216,11 @@ void init() {
 	  /////////////////////////////////////////
 	  // police light coordinates x,y,z
 	  /////////////////////////////////////////
-	  policeredlightlampSource = vec4(-0.015, -0.9, 0.05, 1);
-	  policeredlightlampDest   = vec4(-0.015, -0.9,    -2, 0);
+	  policeredlightlampSource = vec4(0.015, -0.8, 0.05, 1);
+	  policeredlightlampDest   = vec4(0.015, -0.8,    -2, 0);
 
-	  policebluelightlampSource = vec4(0.015, -0.9, 0.05, 1);
-	  policebluelightlampDest   = vec4(0.015, -0.9,   2, 0);
+	  policebluelightlampSource = vec4(-0.015, -0.8, 0.05, 1);
+	  policebluelightlampDest   = vec4(-0.015, -0.8l,   2, 0);
 
 	  turnCarAngle = 0;
 	  turnAngle = 0;
