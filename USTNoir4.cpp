@@ -136,9 +136,6 @@ GLfloat tx, ty, tz;
 GLfloat rx, ry, rz;
 
 
-
-
-
 //////////////////////////////////////////////////
 // current position of the car
 //////////////////////////////////////////////////
@@ -1380,10 +1377,9 @@ void display(void)
 		mv = mv*Translate(0,1,0);
 		
 		mv = mv *RotateX(rx);
-		//mv = mv * RotateY(ry);
-		//mv = mv * RotateZ(rz);
-
-		//mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+		
+		// this is for me to see the scene all around
+		mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
 
 	}
 	else if (switchcamera == 1) // chase cam
@@ -1438,7 +1434,9 @@ void display(void)
   glutSwapBuffers();
 }
 
-
+//////////////////////////////////////
+// Set up properties for all lights
+//////////////////////////////////////
 void setupShader(GLuint prog){
 	
 	
@@ -1454,7 +1452,6 @@ void setupShader(GLuint prog){
 	moonlight_position	= glGetUniformLocation(prog, "lights[0].position");
 	moondiffuse_color	= glGetUniformLocation(prog, "lights[0].diffuse");
 	moonspecular_color	= glGetUniformLocation(prog, "lights[0].specular");
-	
 	moonambient_light	= glGetUniformLocation(prog, "ambient_light");
 
 	///////////////////////////////////////////////////
@@ -1503,9 +1500,7 @@ void setupShader(GLuint prog){
 	policebluespot_cutoff		= glGetUniformLocation(prog, "lights[4].spot_cutoff");
 	policebluespot_exponent		= glGetUniformLocation(prog, "lights[4].spot_exponent");
 
-	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+	
 
 }
 
@@ -1549,26 +1544,7 @@ void setupHeadShader(GLuint prog)
 	headvbo = new GLuint[2];
 	setupShader(prog, headvao, headvbo, headVers, headNormals, totalheadverts);
 
-		// Create a vertex array object
-    /*glGenVertexArrays( 1, &headvao[0] );
-	glBindVertexArray( headvao[0] );
-	glGenBuffers( 2, &headvbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, headvbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, totalheadverts*sizeof(vec4), headVers, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, headvbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, totalheadverts*sizeof(vec3), headNormals, GL_STATIC_DRAW );
-
-
-	glBindVertexArray( headvao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, headvbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, headvbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);ll
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);lb*/
+	
 }
 ///////////////////////////////////////////////////
 // setupHeadShader
@@ -1583,26 +1559,7 @@ void setupSimpleObjShader(GLuint prog)
 	simpleObjvbo = new GLuint[2];
 	setupShader(prog, simpleObjvao, simpleObjvbo, simpleObjVers, simpleObjNormals, totalsimpleobjverts);
 
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &simpleObjvao[0] );
-	glBindVertexArray( simpleObjvao[0] );
-	glGenBuffers( 2, &simpleObjvbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, totalsimpleobjverts*sizeof(vec4), simpleObjVers, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, totalsimpleobjverts*sizeof(vec3), simpleObjNormals, GL_STATIC_DRAW );
 
-
-	glBindVertexArray( simpleObjvao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, simpleObjvbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 ///////////////////////////////////////////////////
@@ -1619,26 +1576,7 @@ void setupCarShader(GLuint prog)
 	carvbo = new GLuint[2];
 	setupShader(prog, carvao, carvbo, carVerts, carNormals, 36);
 
-		// Create a vertex array object
-    /*glGenVertexArrays( 1, &carvao[0] );
-	glBindVertexArray( carvao[0] );
-	glGenBuffers( 2, &carvbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, carvbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 36*sizeof(vec4), carVerts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, carvbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 36*sizeof(vec3), carNormals, GL_STATIC_DRAW );
 
-
-	glBindVertexArray( carvao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, carvbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, carvbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 ///////////////////////////////////////////////////
 // setupPoliceLightShader
@@ -1657,29 +1595,6 @@ void setupPoliceLightShader(GLuint prog)
 
 	
 
-
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &policeredvao[0] );
-	glBindVertexArray( policeredvao[0] );
-	glGenBuffers( 2, &policeredvbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec4), policeLampRedVerts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec3), policeLampRedNormals, GL_STATIC_DRAW );
-
-
-	glBindVertexArray( policeredvao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
-
-
 	// blue
 	vPoliceBlueAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
 	vPoliceBlueSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
@@ -1691,27 +1606,7 @@ void setupPoliceLightShader(GLuint prog)
 	policebluevbo = new GLuint[2];
 	setupShader(prog, policebluevao, policebluevbo, policeLampBlueVerts, policeLampBlueNormals, 144);
 
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &policebluevao[0] );
-	glBindVertexArray( policebluevao[0] );
 
-	glGenBuffers( 2, &policebluevbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, policebluevbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec4), policeLampBlueVerts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, policeredvbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 144*sizeof(vec3), policeLampBlueNormals, GL_STATIC_DRAW );
-
-
-	glBindVertexArray( policebluevao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, policebluevbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, policebluevbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 ///////////////////////////////////////////////////
@@ -1727,26 +1622,6 @@ void setupEyeShader(GLuint prog)
 	eyevbo = new GLuint[2];
 	setupShader(prog, eyevao, eyevbo, eyeVerts, eyeNormals, 75);
 
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &eyevao[0] );
-	glBindVertexArray( eyevao[0] );
-
-	glGenBuffers( 2, &eyevbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, eyevbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec4), eyeVerts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, eyevbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec3), eyeNormals, GL_STATIC_DRAW );
-
-	glBindVertexArray( eyevao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, eyevbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, eyevbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 ///////////////////////////////////////////////////
 // setupWheelShader
@@ -1762,54 +1637,11 @@ void setupWheelShader(GLuint prog)
 	setupShader(prog, wheelside1vao, wheelside1vbo, wheelSide1Verts, wheelSide1Normals, 75);
 
 
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &wheelside1vao[0] );
-	glBindVertexArray( wheelside1vao[0] );
-
-	glGenBuffers( 2, &wheelside1vbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec4), wheelSide1Verts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec3), wheelSide1Normals, GL_STATIC_DRAW );
-
-	glBindVertexArray( wheelside1vao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside1vbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
-
-
 	// wheelside 2
 
 	wheelside2vao = new GLuint[1];
 	wheelside2vbo = new GLuint[2];
 	setupShader(prog, wheelside2vao, wheelside2vbo, wheelSide2Verts, wheelSide2Normals, 75);
-
-
-	/*glGenVertexArrays( 1, &wheelside2vao[0] );
-	glBindVertexArray( wheelside2vao[0] );
-
-	glGenBuffers( 2, &wheelside2vbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec4), wheelSide2Verts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 75*sizeof(vec3), wheelSide2Normals, GL_STATIC_DRAW );
-
-	glBindVertexArray( wheelside2vao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 
 	// cylinder
@@ -1818,27 +1650,7 @@ void setupWheelShader(GLuint prog)
 	cylindervbo = new GLuint[2];
 	setupShader(prog, cylindervao, cylindervbo, wheelCylinderVers, vWheelCylinderNormals, 414);
 
-
-	/*glGenVertexArrays( 1, &cylindervao[0] );
-	glBindVertexArray( cylindervao[0] );
-
-	glGenBuffers( 2, &cylindervbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 414*sizeof(vec4), wheelCylinderVers, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, wheelside2vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 414*sizeof(vec3), vWheelCylinderNormals, GL_STATIC_DRAW );
-
-	glBindVertexArray( cylindervao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, cylindervbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
-
+		
 
 }
 
@@ -1847,31 +1659,14 @@ void setupWheelShader(GLuint prog)
 //////////////////////////////////////////////////
 void setupStageShader(GLuint prog)
 {
+	vStageAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vStageSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vStageSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+
 	stagevao = new GLuint[1];
 	stagevbo = new GLuint[2];
 	setupShader(prog, stagevao, stagevbo, stageVerts, stageNormals, 6);
 
-	// Create a vertex array object
-    /*glGenVertexArrays( 1, &stagevao[0] );
-	glBindVertexArray( stagevao[0] );
-	
-	glGenBuffers( 2, &stagevbo[0] );
-    glBindBuffer( GL_ARRAY_BUFFER, stagevbo[0] );
-	glBufferData( GL_ARRAY_BUFFER, 6*sizeof(vec4), stageVerts, GL_STATIC_DRAW);
-	glBindBuffer( GL_ARRAY_BUFFER, stagevbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, 6*sizeof(vec3), stageNormals, GL_STATIC_DRAW );
-
-
-	glBindVertexArray( stagevao[0] );
-	glBindBuffer( GL_ARRAY_BUFFER, stagevbo[0] );
-	vPosition = glGetAttribLocation(prog, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer( GL_ARRAY_BUFFER, stagevbo[1] );
-	vNormal = glGetAttribLocation(prog, "vNormal");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 }
 
 /////////////////////////////////////////
@@ -2164,20 +1959,14 @@ void Keyboard(unsigned char key, int x, int y) {
 			rz += 360;*/
 	}
 
-	printf("rx = %f\n", rx);
-	printf("ry = %f\n", ry);
-	printf("rz = %f\n", rz);
-
-
-	printf("tx = %f\n", tx);
-	printf("ty = %f\n", ty);
-	printf("tz = %f\n", tz);
-
+	
 	reshape(ww,wh);
 	glutPostRedisplay();
 
 }
-
+////////////////////////////////////////////
+// This is for me for testing the scene
+///////////////////////////////////////////
 void mouse_dragged(int x, int y) {
 	double thetaY, thetaX;
 	if (left_button_down) {
@@ -2223,7 +2012,7 @@ void init() {
 	/*select clearing (background) color*/
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	  
-    turnPoliceLampAngle = 0;
+	turnPoliceLampAngle = 0;
 	turnOnPoliceLight = false;
 	startcar = false;
 
