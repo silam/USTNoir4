@@ -13,7 +13,7 @@ typedef Angel::vec4  point4;
 
 //store window width and height
 //store window width and height
-int ww=1500, wh=1100;
+int ww=1700, wh=1100;
 /////////////////////////
 // stack
 /////////////////////////
@@ -1377,13 +1377,13 @@ void display(void)
 	if ( switchcamera == 0 ) // static cam
 	{
 		mv = LookAt(vec4(0, 0, dollyzoom, 1.0), vec4(atX, 0, atZ, 1.0), vec4(0, 1, 0, 0.0));
-
-		//mv = mv * Translate(tx, ty, tz);
+		mv = mv*Translate(0,1,0);
+		
 		mv = mv *RotateX(rx);
 		//mv = mv * RotateY(ry);
 		//mv = mv * RotateZ(rz);
 
-		mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+		//mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
 
 	}
 	else if (switchcamera == 1) // chase cam
@@ -2229,7 +2229,7 @@ void init() {
 
 	  atX = atZ = 0;
 	  dollyzoom = 3.0f;
-	  lenszoom = 45.0;
+	  lenszoom = 25.0;
 	  rx = 30;
 	  ty = 0.8;
 	  tz = 19.2;
