@@ -52,6 +52,9 @@ GLboolean startcar;
 vec4* policeLightVers;
 vec3* policeLightNormals;
 
+GLuint * policelightvao;
+GLuint * policelightvbo;
+
 GLuint * policeredvao;
 GLuint * policeredvbo;
 GLuint * policebluevao;
@@ -162,6 +165,7 @@ GLint turnEyeRight;
 //////////////////////////
 GLboolean  pointCameraAt;
 GLfloat lenszoom;
+GLfloat currentlenszoom;
 GLfloat dollyzoom;
 GLfloat atX, atZ;
 
@@ -372,6 +376,7 @@ void reshape(int width, int height){
 	ww= width;
 	wh = height;
 	//field of view angle, aspect ratio, closest distance from camera to object, largest distanec from camera to object
+	
 	p = Perspective(lenszoom, (float)width/(float)height, 1.0, 100.0);
 	glUniformMatrix4fv(projection, 1, GL_TRUE, p);
 	glViewport( 0, 0, width, height );
@@ -615,7 +620,9 @@ void generateCar(){
 
 
 	int index = 0;
-
+	///////////////////
+	// front 
+	//////////////////
 	carVerts[0] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[1] = vec4( 0.05f,  0.05f, 0.05f, 1.0);
 	carVerts[2] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
@@ -638,7 +645,9 @@ void generateCar(){
 	carNormals[index++] = normal; 
 
 
-	
+	///////////////////
+	// back 
+	//////////////////
 	carVerts[6] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[7] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[8] = vec4(0.05f, 0.05f, -0.05f, 1.0);
@@ -767,7 +776,7 @@ void generateWheelSides()
 
 	
 
-	int side = 1; // the outer side of the wheel
+	int side = 1; // the Left side of the wheel
 	
 	int point = 0;
 	double angleincrement = 15;
@@ -781,13 +790,13 @@ void generateWheelSides()
 		
 		vec3 normal = normalize(cross(c-b, a -b));
 
-		wheelSide1Normals[point-3] = normal;
-		wheelSide1Normals[point-2] = normal;
-		wheelSide1Normals[point-1] = normal;
+		wheelSide1Normals[point-3] = vec3(0.0, 0.0, 1.0); // normal;
+		wheelSide1Normals[point-2] = vec3(0.0, 0.0, 1.0);;
+		wheelSide1Normals[point-1] = vec3(0.0, 0.0, 1.0);;
 
 	}
 
-	side = -1; // the inner side of the wheel
+	side = -1; // the Right side of the wheel
 	point = 0;
 	angleincrement = 15;
 	for ( double angle = 0; angle <= 360; angle += angleincrement)
@@ -800,9 +809,9 @@ void generateWheelSides()
 		
 		vec3 normal = normalize(cross(c-b, a -b));
 
-		wheelSide2Normals[point-3] = normal;
-		wheelSide2Normals[point-2] = normal;
-		wheelSide2Normals[point-1] = normal;
+		wheelSide2Normals[point-3] = vec3(0.0, 0.0, -1.0);;
+		wheelSide2Normals[point-2] = vec3(0.0, 0.0, -1.0);;
+		wheelSide2Normals[point-1] = vec3(0.0, 0.0, -1.0);;
 	}
 
 
@@ -987,11 +996,15 @@ void displayStage(void)
    
 }
 /////////////////////////////////////////
-// displaySimpleObj
+// displayPoliceLights
 /////////////////////////////////////////
 void displayPoliceLights()
 {
-	
+	if ( turnOnPoliceLight == true )
+		glVertexAttrib4fv(vPoliceIsOn, lightOn);
+	else
+		glVertexAttrib4fv(vPoliceIsOn, lightOff);
+
 	stack.push(mv);
 		
 	
@@ -1000,6 +1013,30 @@ void displayPoliceLights()
 
 	mv = mv * Translate(0.0, -0.83, -0.08); // 0.05
 	mv = mv * Scale(0.02,0.05,0.02);
+	
+	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1, 1.0, 1.0, 1));
+	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
+	glVertexAttrib1f(vPoliceRedSpecularExponent, 10.0);
+
+	DrawTriagle(policelightvao, totalsimpleobjverts);
+
+	mv = stack.pop();
+
+}
+
+/////////////////////////////////////////
+// displayHeadLights
+/////////////////////////////////////////
+void displayHeadLights()
+{
+	
+	stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+
+	mv = mv * Translate(0.0, -0.95, 0.10); // 0.05
+	mv = mv * Scale(0.05,0.08,0.04);
 	
 	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1, 1.0, 1.0, 1));
 	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1034,7 +1071,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(-0.8, -0.9, 0.8); // 0.05
-	mv = mv * Scale(0.5,0.2,0.2);
+	mv = mv * Scale(0.1,0.5,0.2);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1, 0.0, .5, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1049,7 +1086,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(-0.8, -0.9, -0.8); // 0.05
-	mv = mv * Scale(0.2,0.2,0.5);
+	mv = mv * Scale(0.2,0.5,0.1);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(0.0, 1.0, .5, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1064,7 +1101,7 @@ void displaySimpleObj()
 	stack.push(mv);
 		
 	mv = mv * Translate(0.8, -0.9, -0.8); // 0.05
-	mv = mv * Scale(0.5,0.2,0.5);
+	mv = mv * Scale(0.1,0.5,0.1);
 	
 	glVertexAttrib4fv(vSimpleObjAmbientDiffuseColor, vec4(1.0, 0.0, 1.0, 1));
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
@@ -1088,11 +1125,9 @@ void displayEye()
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
 	
-	
-	mv = mv * Translate(0, 0.034, 0.015);
+		mv = mv * Translate(0.0, -0.88, 0.0);
 	mv = mv * RotateY(turnEyeAngle);
-	mv = mv * Translate(0.02, -0.92, 0.01); // -0.905
-	
+	mv = mv * Translate(0.02, 0.00, 0.05);
 	mv = mv * RotateX(90);
 	mv = mv * Scale(0.010f,0.010f,0.010f);
 
@@ -1110,12 +1145,10 @@ void displayEye()
 	
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
-		
-	//mv = mv * Translate(0, 0, 0.05);
-	mv = mv * Translate(0, 0.034, 0.015);
+	
+	mv = mv * Translate(0.0, -0.88, 0.0);
 	mv = mv * RotateY(turnEyeAngle);
-	//mv = mv * Translate(-0.006, -0.905, 0.01);
-	mv = mv * Translate(-0.02, -0.92, 0.01); // -0.905
+	mv = mv * Translate(-0.02, 0.00, 0.05);
 	mv = mv * RotateX(90);
 	mv = mv * Scale(0.010f,0.010f,0.010f);
 
@@ -1138,7 +1171,7 @@ void displayHead()
 	mv = mv * Translate(currentX, 0, currentZ);
 	mv = mv * RotateY(turnCarAngle);
 
-	mv = mv * Translate(0, -0.90, -0.02); // 0.05
+	mv = mv * Translate(0, -0.90, -0.01); // 0.05
 	// mv = mv * RotateY(turnEyeAngle); // rotate head even head is just a white sphere
 	mv = mv * Scale(0.03,0.03,0.03);
 	
@@ -1423,7 +1456,6 @@ void display(void)
 		{
 			
 			viewpoint = RotateY(turnEyeAngle) * viewpointcam;
-
 			view = viewpoint;
 			
 		}
@@ -1453,6 +1485,7 @@ void display(void)
 	displayEye();
 	//displayPoliceLamps();
 	displayPoliceLights();
+	// will come back to look at : displayHeadLights();
 	displayWheels();
 		
     glFlush();
@@ -1615,9 +1648,9 @@ void setupPoliceLightsShader(GLuint prog)
 	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
 
 
-	policeredvao = new GLuint[1];
-	policeredvbo = new GLuint[2];
-	setupShader(prog, policeredvao, policeredvbo, policeLightVers, policeLightNormals, totalheadverts);
+	policelightvao = new GLuint[1];
+	policelightvbo = new GLuint[2];
+	setupShader(prog, policelightvao, policelightvbo, policeLightVers, policeLightNormals, totalheadverts);
 		
 
 	// blue
@@ -1904,11 +1937,15 @@ void Keyboard(unsigned char key, int x, int y) {
 	{
 		if ( switchcamera == 0 )
 		{
+			currentlenszoom = lenszoom;
+			
 			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 1;
 		}
 		else if ( switchcamera == 1 )
 		{
+			currentlenszoom = lenszoom;
+			
 			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 2;
 		}
@@ -2095,11 +2132,11 @@ void init() {
 	  currentX = currentZ = 0;
 
 	  // right lamp
-	  rightlampSource = vec4(-0.02,-0.97,0.20,1); 
+	  rightlampSource = vec4(-0.02,-0.97 ,0.20  ,1); 
 	  rightlampDest   = vec4(-0.04,-1   ,0.27,  0); 
 
 	   
-	  leftlampSource = vec4(0.02,-0.97,0.20,1); 
+	  leftlampSource = vec4(0.02,-0.97 ,0.20,1); 
 	  leftlampDest   = vec4(0.04,-1   ,0.27,  0); 
 
 	  /////////////////////////////////////////
