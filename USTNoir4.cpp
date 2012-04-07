@@ -94,6 +94,9 @@ GLuint vHeadSpecularExponent;
 GLuint * carvao;
 GLuint * carvbo;
 
+
+GLuint * headLightLampsvao;
+GLuint * headLightLampsvbo;
 //////////////////////////////////////////////////
 // // turn the wheel left/right angle
 //////////////////////////////////////////////////
@@ -264,8 +267,7 @@ vec3* policeLampBlueNormals;
 GLuint vStageAmbientDiffuseColor;
 GLuint vStageSpecularColor;
 GLuint vStageSpecularExponent;
-vec4* sphere_verts;
-vec3* sphere_normals;
+
 vec4* stageVerts;
 vec3* stageNormals;
 
@@ -279,8 +281,11 @@ GLuint vCarSpecularExponent;
 
 vec4* carVerts;
 vec3* carNormals;
-vec4* carColors;
 
+//////////////////////////////
+vec4* lampVerts;
+vec3* lampNormals;
+/////////////////////////////////
 //////////////////////////////
 // simple objects
 /////////////////////////////
@@ -292,11 +297,10 @@ GLuint vSimpleObjSpecularExponent;
 // moon light
 //////////////////////////////
 GLuint moonlight_position;
-//GLuint moonlight_color;
 GLuint moondiffuse_color;
 GLuint moonspecular_color;
 GLuint moonambient_light;
-GLboolean ismoonOn;
+
 
 //////////////////////////////
 // head light
@@ -669,16 +673,18 @@ void generateCar(){
 	carNormals[index++] = normal; 
 	carNormals[index++] = normal; 
 
-
+		///////////////////
+	// right hand of me
+	//////////////////
 	carVerts[12] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	carVerts[13] = vec4(0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[14] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[13] - carVerts[12], carVerts[14] - carVerts[13]));
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
+	carNormals[index++] = vec3(1,0,0); //-normal; 
+	carNormals[index++] = vec3(1,0,0);//-normal; 
+	carNormals[index++] = vec3(1,0,0);//-normal; 
 
 	carVerts[15] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[16] = vec4(0.05f, 0.05f, -0.05f, 1.0);
@@ -687,11 +693,13 @@ void generateCar(){
 
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[16] - carVerts[15], carVerts[17] - carVerts[16]));
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
+	carNormals[index++] = vec3(1,0,0);//-normal; 
+	carNormals[index++] = vec3(1,0,0);//-normal; 
+	carNormals[index++] = vec3(1,0,0);//-normal; 
 
-
+	///////////////////
+	// left hand of me (left car)
+	//////////////////
 	
 	carVerts[18] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[19] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
@@ -699,9 +707,9 @@ void generateCar(){
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[19] - carVerts[18], carVerts[20] - carVerts[19]));
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
 
 
 	carVerts[21] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
@@ -710,20 +718,24 @@ void generateCar(){
 	
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[22] - carVerts[21], carVerts[23] - carVerts[22]));
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
-	carNormals[index++] = -normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
+	carNormals[index++] = vec3(-1,0,0);//-normal; 
 
 		
+	///////////////////
+	// top car
+	//////////////////
+	
 	carVerts[24] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	carVerts[25] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[26] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[26] - carVerts[25], carVerts[24] - carVerts[25]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
+	carNormals[index++] = vec3(0,1,0); //normal; 
+	carNormals[index++] = vec3(0,1,0); //normal; 
+	carNormals[index++] = vec3(0,1,0); //normal; 
 
 	carVerts[27] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[28] = vec4(-0.05f, 0.05f, 0.05f, 1.0);
@@ -731,22 +743,22 @@ void generateCar(){
 	
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[29] - carVerts[28], carVerts[28] - carVerts[27]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal;
+	carNormals[index++] = vec3(0,1,0); //normal; 
+	carNormals[index++] = vec3(0,1,0); //normal; 
+	carNormals[index++] = vec3(0,1,0); //normal;
 
-	//for(int i=30; i<36; i++){
-	//	carColors[i] = vec4(0.0, 1.0, 0.0, 1.0); //bottom
-	//}
+	///////////////////
+	// bottom car
+	//////////////////
 	carVerts[30] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[31] = vec4(0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[32] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[31] - carVerts[30], carVerts[32] - carVerts[31]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal;
+	carNormals[index++] = vec3(0,-1,0); //normal; 
+	carNormals[index++] = vec3(0,-1,0);//normal; 
+	carNormals[index++] = vec3(0,-1,0);//normal;
 
 	carVerts[33] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[34] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
@@ -754,11 +766,165 @@ void generateCar(){
 
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[34] - carVerts[33], carVerts[35] - carVerts[34]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal;
+	carNormals[index++] = vec3(0,-1,0);//normal; 
+	carNormals[index++] = vec3(0,-1,0);//normal; 
+	carNormals[index++] = vec3(0,-1,0);//normal;
 	
 }
+
+
+/////////////////////////////////////////
+// generateCar
+/////////////////////////////////////////
+
+void generateHeadLightLamps(){
+
+	lampVerts = new vec4[36];
+	lampNormals = new vec3[36];
+
+
+	int index = 0;
+	///////////////////
+	// front 
+	//////////////////
+	lampVerts[0] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[1] = vec4( 0.05f,  0.05f, 0.05f, 1.0);
+	lampVerts[2] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
+
+	// calculate normal vectore for car
+	vec3 normal = normalize(cross(carVerts[2] - carVerts[1], carVerts[0] - carVerts[1]));
+	lampNormals[index++] = vec3(0,0,-1); //normal; 
+	lampNormals[index++] = vec3(0,0,-1);//normal; 
+	lampNormals[index++] = vec3(0,0,-1);//normal; 
+
+
+	lampVerts[3] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
+	lampVerts[4] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[5] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
+	
+	// calculate normal vectore for car
+	//normal = normalize(cross( carVerts[5] - carVerts[4], carVerts[3] - carVerts[4]));
+	lampNormals[index++] = vec3(0,0,-1);//normal; 
+	lampNormals[index++] = vec3(0,0,-1);//normal; 
+	lampNormals[index++] = vec3(0,0,-1);//normal; 
+
+
+	///////////////////
+	// back 
+	//////////////////
+	lampVerts[6] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[7] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[8] = vec4(0.05f, 0.05f, -0.05f, 1.0);
+
+
+	// calculate normal vectore for car
+	normal = normalize(cross(carVerts[7] - carVerts[6], carVerts[8] - carVerts[7]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+
+	lampVerts[9] = vec4(0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[10] = vec4(0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[11] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
+
+	// calculate normal vectore for car
+	// normal = normalize(cross(carVerts[10] - carVerts[9], carVerts[11] - carVerts[10]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+
+
+	lampVerts[12] = vec4(0.05f, 0.05f, 0.05f, 1.0);
+	lampVerts[13] = vec4(0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[14] = vec4(0.05f, -0.05f, -0.05f, 1.0);
+
+	// calculate normal vectore for car
+	normal = normalize(cross(carVerts[13] - carVerts[12], carVerts[14] - carVerts[13]));
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+
+	lampVerts[15] = vec4(0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[16] = vec4(0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[17] = vec4(0.05f, 0.05f, 0.05f, 1.0);
+	
+
+	// calculate normal vectore for car
+	// normal = normalize(cross(carVerts[16] - carVerts[15], carVerts[17] - carVerts[16]));
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+
+
+	
+	lampVerts[18] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[19] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[20] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
+
+	// calculate normal vectore for car
+	normal = normalize(cross(carVerts[19] - carVerts[18], carVerts[20] - carVerts[19]));
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+
+
+	lampVerts[21] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[22] = vec4(-0.05f, 0.05f, 0.05f, 1.0);
+	lampVerts[23] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
+	
+	// calculate normal vectore for car
+	// normal = normalize(cross(carVerts[22] - carVerts[21], carVerts[23] - carVerts[22]));
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+	lampNormals[index++] = -normal; 
+
+		
+	lampVerts[24] = vec4(0.05f, 0.05f, 0.05f, 1.0);
+	lampVerts[25] = vec4(0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[26] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
+
+	// calculate normal vectore for car
+	normal = normalize(cross(carVerts[26] - carVerts[25], carVerts[24] - carVerts[25]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+
+	lampVerts[27] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
+	lampVerts[28] = vec4(-0.05f, 0.05f, 0.05f, 1.0);
+	lampVerts[29] = vec4(0.05f, 0.05f, 0.05f, 1.0);
+	
+	// calculate normal vectore for car
+	// normal = normalize(cross(carVerts[29] - carVerts[28], carVerts[28] - carVerts[27]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal;
+
+	//for(int i=30; i<36; i++){
+	//	carColors[i] = vec4(0.0, 1.0, 0.0, 1.0); //bottom
+	//}
+	lampVerts[30] = vec4(0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[31] = vec4(0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[32] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
+
+	// calculate normal vectore for car
+	normal = normalize(cross(carVerts[31] - carVerts[30], carVerts[32] - carVerts[31]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal;
+
+	lampVerts[33] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
+	lampVerts[34] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
+	lampVerts[35] = vec4(0.05f, -0.05f, -0.05f, 1.0);
+
+	// calculate normal vectore for car
+	// normal = normalize(cross(carVerts[34] - carVerts[33], carVerts[35] - carVerts[34]));
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal; 
+	lampNormals[index++] = normal;
+	
+}
+
+
 
 /////////////////////////////////////////
 // generateWheelSides
@@ -788,11 +954,11 @@ void generateWheelSides()
 		
 		point4 c = wheelSide1Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
 		
-		vec3 normal = normalize(cross(c-b, a -b));
+		//vec3 normal = normalize(cross(c-b, a -b));
 
-		wheelSide1Normals[point-3] = vec3(0.0, 0.0, 1.0); // normal;
-		wheelSide1Normals[point-2] = vec3(0.0, 0.0, 1.0);;
-		wheelSide1Normals[point-1] = vec3(0.0, 0.0, 1.0);;
+		wheelSide1Normals[point-3] = vec3(0.0, -1.0, 0.0);//vec3(0.0, 0.0, 1.0); // normal;
+		wheelSide1Normals[point-2] = vec3(0.0, -1.0, 0.0);//vec3(0.0, 0.0, 1.0);;
+		wheelSide1Normals[point-1] = vec3(0.0, -1.0, 0.0);//vec3(0.0, 0.0, 1.0);;
 
 	}
 
@@ -807,11 +973,11 @@ void generateWheelSides()
 		
 		point4 c = wheelSide2Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
 		
-		vec3 normal = normalize(cross(c-b, a -b));
+		//vec3 normal = normalize(cross(c-b, a -b));
 
-		wheelSide2Normals[point-3] = vec3(0.0, 0.0, -1.0);;
-		wheelSide2Normals[point-2] = vec3(0.0, 0.0, -1.0);;
-		wheelSide2Normals[point-1] = vec3(0.0, 0.0, -1.0);;
+		wheelSide2Normals[point-3] = vec3(0.0, 1.0, 0.0);//vec3(0.0, 0.0, -1.0);;
+		wheelSide2Normals[point-2] = vec3(0.0, 1.0, 0.0);//vec3(0.0, 0.0, -1.0);;
+		wheelSide2Normals[point-1] = vec3(0.0, 1.0, 0.0);//vec3(0.0, 0.0, -1.0);;
 	}
 
 
@@ -1188,7 +1354,31 @@ void displayHead()
 
 
 }
+/////////////////////////////////////////
+// displayHeadLightLamps
+/////////////////////////////////////////
+void displayHeadLightLamps(void)
+{
+	
+	stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	 
+	mv = mv * Translate(0, -0.93, 0.085); 
+	mv = mv * Scale(0.5,0.25,0.2 );
+	
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 1.0);
+
+
+	DrawTriagle(headLightLampsvao, 36);
+
+	mv = stack.pop();
+}
 /////////////////////////////////////////
 // displayCar
 /////////////////////////////////////////
@@ -1214,6 +1404,28 @@ void displayCar(void)
 	DrawTriagle(carvao, 36);
 
 	mv = stack.pop();
+	/////////////////////////////
+	//////////////////////////////
+	/*stack.push(mv);
+	
+	mv = mv * Translate(currentX, 0, currentZ);
+	mv = mv * RotateY(turnCarAngle);
+	 
+	mv = mv * Translate(0, -0.93, 0.10); 
+	mv = mv * Scale(0.5,0.25,0.5 );
+	
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+
+	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
+	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
+	glVertexAttrib1f(vCarSpecularExponent, 1.0);
+
+
+	DrawTriagle(carvao, 36);
+
+	mv = stack.pop();*/
+
+	//////////////
 
 
 	// upper stage
@@ -1292,6 +1504,7 @@ void displayWheels()
 	mv = stack.pop();
 
 
+
 	/////////////////////////////////
 	// seconf wheel: passenger wheel
 	/////////////////////////////////
@@ -1316,6 +1529,7 @@ void displayWheels()
 
 	mv = stack.pop();
 
+
 	/////////////////////////////////
 	// third wheel
 	/////////////////////////////////
@@ -1339,7 +1553,7 @@ void displayWheels()
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
 	
 	mv = stack.pop();
-
+		
 	/////////////////////////////////
 	// fourth wheel
 	/////////////////////////////////
@@ -1481,6 +1695,7 @@ void display(void)
 	displayStage();
 	displaySimpleObj();
 	displayCar();
+	displayHeadLightLamps();
 	displayHead();
 	displayEye();
 	//displayPoliceLamps();
@@ -1634,6 +1849,22 @@ void setupCarShader(GLuint prog)
 	carvao = new GLuint[1];
 	carvbo = new GLuint[2];
 	setupShader(prog, carvao, carvbo, carVerts, carNormals, 36);
+
+
+}
+
+///////////////////////////////////////////////////
+// setupCarShader
+//////////////////////////////////////////////////
+void setupHeadLightLampsShader(GLuint prog)
+{
+	vCarAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vCarSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vCarSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+	
+	headLightLampsvao = new GLuint[1];
+	headLightLampsvbo = new GLuint[2];
+	setupShader(prog, headLightLampsvao, headLightLampsvbo, lampVerts, lampNormals, 36);
 
 
 }
@@ -2132,12 +2363,12 @@ void init() {
 	  currentX = currentZ = 0;
 
 	  // right lamp
-	  rightlampSource = vec4(-0.02,-0.97 ,0.20  ,1); 
-	  rightlampDest   = vec4(-0.04,-1   ,0.27,  0); 
+	  rightlampSource = vec4(-0.02,-0.97 + 0.05,0.070  ,1); 
+	  rightlampDest   = vec4(-0.04,-1   + 0.05 ,20,  0); 
 
 	   
-	  leftlampSource = vec4(0.02,-0.97 ,0.20,1); 
-	  leftlampDest   = vec4(0.04,-1   ,0.27,  0); 
+	  leftlampSource = vec4(0.02,-0.97 + 0.05,0.070,1); 
+	  leftlampDest   = vec4(0.04,-1   +0.05 ,20,  0); 
 
 	  /////////////////////////////////////////
 	  // police light coordinates x,y,zl
@@ -2161,6 +2392,7 @@ void init() {
     generateStage();
 	generateSimpleObject();
 	generateCar();
+	generateHeadLightLamps();
 	generateHead();
 	generateEyes();
 	//generatePoliceLamp();
@@ -2175,6 +2407,7 @@ void init() {
 	setupStageShader(program);
 	setupSimpleObjShader(program);
 	setupCarShader(program);
+	setupHeadLightLampsShader(program);
 	setupHeadShader(program);
 	setupEyeShader(program);
 	//setupPoliceLightShader(program);
