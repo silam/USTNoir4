@@ -991,18 +991,31 @@ void generateWheelSides()
 		point4 b = wheelCylinderVers[i+1] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		point4 c = wheelCylinderVers[i+2] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
 
-		vec3 normal = normalize(cross(c - b, a - b));
-		vWheelCylinderNormals[i] = normal;
-		vWheelCylinderNormals[i+1] = normal;
-		vWheelCylinderNormals[i+2] = normal;
+		//vec3 normal = normalize(cross(c - b, a - b));
+
+		point4 va = a - point4(0,-1,0,1);
+		vWheelCylinderNormals[i]   =  vec3(va.x, va.y, va.z); //normal;
+
+		point4 vb = b - point4(0,-1,0,1);
+		vWheelCylinderNormals[i+1] = vec3(vb.x, vb.y, vb.z); //normal;
+
+		point4 vc = c - point4(0,1,0,1);
+		vWheelCylinderNormals[i+2] = vec3(vc.x, vc.y, vc.z); // normal;
 
 		a = wheelCylinderVers[i+3] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		b = wheelCylinderVers[i+4] = wheelSide2Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		c = wheelCylinderVers[i+5] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
-		normal = normalize(cross(c - b, a - b));
-		vWheelCylinderNormals[i+3] = normal;
-		vWheelCylinderNormals[i+4] = normal;
-		vWheelCylinderNormals[i+5] = normal;
+		//normal = normalize(cross(c - b, a - b));
+
+
+		va = a - point4(0,-1,0,1);
+		vWheelCylinderNormals[i+3] =  vec3(va.x, va.y, va.z); //normal;;
+
+		vb = b - point4(0,1,0,1);
+		vWheelCylinderNormals[i+4] = vec3(vb.x, vb.y, vb.z); //normal;;;
+
+		vc = c - point4(0,1,0,1);
+		vWheelCylinderNormals[i+5] = vec3(vc.x, vc.y, vc.z); // normal;;
 
 
 		p++;
@@ -1484,7 +1497,7 @@ void displayWheels()
 	mv = mv * RotateY(turnCarAngle);
 		
 		
-	mv = mv * Translate(0.04, -0.97f, 0.0405); //0.065); // 0.04);
+	mv = mv * Translate(0.04, -0.97f, 0.0405); 
 	mv = mv * RotateZ(90);
 	mv = mv * RotateX(turnAngle);
     mv = mv * RotateY(-rollangle);
@@ -1546,8 +1559,10 @@ void displayWheels()
 	mv = mv * RotateY(-rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 
+
+	
 	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
-	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.0f, 0.0f,.0f,1.0f));
+	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
 	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
 	DrawWheels(wheelside1vao,wheelside2vao,cylindervao, 75, 414);
