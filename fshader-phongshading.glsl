@@ -11,10 +11,10 @@ in vec4 IsOn;
 
 uniform vec4 light_position;
 uniform vec4 light_color;
-uniform vec4 ambient_light;
+//uniform vec4 ambient_light;
 uniform vec4 spot_direction;
 uniform float spot_cutoff;
-uniform float spot_exponent;
+//uniform float spot_exponent;
 
 struct lightSource
 {
@@ -22,7 +22,7 @@ struct lightSource
 	vec4 position;
 	vec4 diffuse;
 	vec4 specular;
-	float constantAttenuation, linearAttenuation, quadraticAttenuation;
+	////float constantAttenuation, linearAttenuation, quadraticAttenuation;
 	float spot_cutoff, spotExponent,spotCosCutoff; // (range: [1.0,0.0],-1.0)
 	vec4 spot_direction;
 	
@@ -31,14 +31,6 @@ struct lightSource
 uniform lightSource lights[NUM_LIGHTS];
 flat in int lightOn[NUM_LIGHTS];
 vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
-struct material
-{
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
-	float shininess;
-};
-
 
 out vec4  fColor;
 
@@ -46,8 +38,7 @@ void main()
 {
 	
 	vec4 globalamb = AmbientDiffuseColor * scene_ambient;
-	float  attenuation = 1;
-
+	
 	vec4 final_color = globalamb;
 	vec3 L;
 	
@@ -63,7 +54,7 @@ void main()
 				
 		if ( lights[index].position.w == 0 ) // directional light
 		{
-			//attenuation = 1;
+			
 			L = normalize( lights[index].position.xyz); // - position.xyz);
 			
 			vec3 H = normalize(L+E);
@@ -87,14 +78,12 @@ void main()
 					  float clampedCosine = max(0.0, dot(-L, normalize(lights[index].spot_direction.xyz)));
 					  if (clampedCosine > cos(radians(lights[index].spot_cutoff))) // outside of spotlight cone?
 					  {
-						     					  
-						    //attenuation = 1;// attenuation * pow(clampedCosine, 1);   
-						    
+						   					    
 							vec3 H = normalize(L+E);
 
-							vec4 diff = attenuation*clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
+							vec4 diff = clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
 
-							vec4 spec = attenuation*pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
+							vec4 spec = pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
 	
 							if(dot(L,N) < 0.0){
 								spec = vec4(0,0,0,1);

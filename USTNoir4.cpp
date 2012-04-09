@@ -1404,7 +1404,7 @@ void displayCar(void)
 	mv = mv * RotateY(turnCarAngle);
 	 
 	mv = mv * Translate(0, -0.93, 0.0005); 
-	//mv = mv * Scale(1.0,0.5,3);
+	
 	mv = mv * Scale(0.5,0.25,1.5 );
 	
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
@@ -1417,30 +1417,7 @@ void displayCar(void)
 	DrawTriagle(carvao, 36);
 
 	mv = stack.pop();
-	/////////////////////////////
-	//////////////////////////////
-	/*stack.push(mv);
 	
-	mv = mv * Translate(currentX, 0, currentZ);
-	mv = mv * RotateY(turnCarAngle);
-	 
-	mv = mv * Translate(0, -0.93, 0.10); 
-	mv = mv * Scale(0.5,0.25,0.5 );
-	
-	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-
-	glVertexAttrib4fv(vCarAmbientDiffuseColor, vec4(1.0f, 1.0f, 0.0f, 1));
-	glVertexAttrib4fv(vCarSpecularColor, vec4(0.4f, 0.4f,0.4f,1.0f));
-	glVertexAttrib1f(vCarSpecularExponent, 1.0);
-
-
-	DrawTriagle(carvao, 36);
-
-	mv = stack.pop();*/
-
-	//////////////
-
-
 	// upper stage
 
 	stack.push(mv);
@@ -1506,7 +1483,7 @@ void displayWheels()
     
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
-	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.0f, 0.f, 0.0f, 1));
 	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
 	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
@@ -1534,7 +1511,7 @@ void displayWheels()
 	mv = mv * RotateY(rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 
-	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor,vec4(0.0f, 0.f, 0.0f, 1));
 	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
 	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
@@ -1561,7 +1538,7 @@ void displayWheels()
 
 
 	
-	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.0f, 0.f, 0.0f, 1));
 	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
 	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
@@ -1584,7 +1561,7 @@ void displayWheels()
 	mv = mv * RotateY(rollangle);
 	mv = mv * Scale(0.025,0.007,0.025);
 		
-	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.5f, 0.9f, 1.0f, 1));
+	glVertexAttrib4fv(vWheelSide1AmbientDiffuseColor, vec4(0.0f, 0.f, 0.0f, 1));
 	glVertexAttrib4fv(vWheelSide1SpecularColor, vec4(0.4f, 0.0f,.0f,1.0f));
 	glVertexAttrib1f(vWheelSide1SpecularExponent, 1.0);
 
