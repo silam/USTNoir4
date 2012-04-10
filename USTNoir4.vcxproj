@@ -79,11 +79,7 @@
     <ClCompile Include="USTNoir4.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader-celshading.glsl" />
-    <None Include="fshader-lighting.glsl" />
     <None Include="fshader-phongshading.glsl" />
-    <None Include="vshader-celshading.glsl" />
-    <None Include="vshader-lighting.glsl" />
     <None Include="vshader-phongshading.glsl" />
   </ItemGroup>
   <ItemGroup>

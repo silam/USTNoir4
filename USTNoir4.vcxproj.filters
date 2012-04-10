@@ -27,11 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="vshader-phongshading.glsl" />
-    <None Include="fshader-celshading.glsl" />
-    <None Include="fshader-lighting.glsl" />
     <None Include="fshader-phongshading.glsl" />
-    <None Include="vshader-celshading.glsl" />
-    <None Include="vshader-lighting.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="matrix_stack.h">
