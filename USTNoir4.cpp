@@ -700,7 +700,7 @@ void generateCar(){
 	
 
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[16] - carVerts[15], carVerts[17] - carVerts[16]));
+	
 	carNormals[index++] = vec3(1,0,0);//-normal; 
 	carNormals[index++] = vec3(1,0,0);//-normal; 
 	carNormals[index++] = vec3(1,0,0);//-normal; 
@@ -725,7 +725,7 @@ void generateCar(){
 	carVerts[23] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[22] - carVerts[21], carVerts[23] - carVerts[22]));
+	
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
@@ -807,7 +807,7 @@ void generateHeadLightLamps(){
 	lampVerts[2] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
-	vec3 normal = normalize(cross(carVerts[2] - carVerts[1], carVerts[0] - carVerts[1]));
+	
 	lampNormals[index++] = vec3(0,0,-1); //normal; 
 	lampNormals[index++] = vec3(0,0,-1);//normal; 
 	lampNormals[index++] = vec3(0,0,-1);//normal; 
@@ -818,7 +818,7 @@ void generateHeadLightLamps(){
 	lampVerts[5] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
 	
 	// calculate normal vectore for car
-	//normal = normalize(cross( carVerts[5] - carVerts[4], carVerts[3] - carVerts[4]));
+	
 	lampNormals[index++] = vec3(0,0,-1);//normal; 
 	lampNormals[index++] = vec3(0,0,-1);//normal; 
 	lampNormals[index++] = vec3(0,0,-1);//normal; 
@@ -854,7 +854,7 @@ void generateHeadLightLamps(){
 	lampVerts[14] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[13] - carVerts[12], carVerts[14] - carVerts[13]));
+	
 	lampNormals[index++] = vec3(-1,0,0); 
 	lampNormals[index++] = vec3(-1,0,0); 
 	lampNormals[index++] = vec3(-1,0,0);
@@ -865,7 +865,7 @@ void generateHeadLightLamps(){
 	
 
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[16] - carVerts[15], carVerts[17] - carVerts[16]));
+	
 	lampNormals[index++] = vec3(-1,0,0);
 	lampNormals[index++] = vec3(-1,0,0);
 	lampNormals[index++] = vec3(-1,0,0);
@@ -877,7 +877,7 @@ void generateHeadLightLamps(){
 	lampVerts[20] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[19] - carVerts[18], carVerts[20] - carVerts[19]));
+	
 	lampNormals[index++] = vec3(1,0,0); 
 	lampNormals[index++] = vec3(1,0,0); 
 	lampNormals[index++] = vec3(1,0,0); 
@@ -888,7 +888,7 @@ void generateHeadLightLamps(){
 	lampVerts[23] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[22] - carVerts[21], carVerts[23] - carVerts[22]));
+	
 	lampNormals[index++] = vec3(1,0,0); 
 	lampNormals[index++] = vec3(1,0,0); 
 	lampNormals[index++] = vec3(1,0,0); 
@@ -922,7 +922,7 @@ void generateHeadLightLamps(){
 	lampVerts[32] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[31] - carVerts[30], carVerts[32] - carVerts[31]));
+	
 	lampNormals[index++] = vec3(0,-1,0); 
 	lampNormals[index++] = vec3(0,-1,0); 
 	lampNormals[index++] = vec3(0,-1,0);
@@ -932,7 +932,7 @@ void generateHeadLightLamps(){
 	lampVerts[35] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[34] - carVerts[33], carVerts[35] - carVerts[34]));
+	
 	lampNormals[index++] = vec3(0,-1,0); 
 	lampNormals[index++] = vec3(0,-1,0); 
 	lampNormals[index++] = vec3(0,-1,0);
@@ -989,7 +989,7 @@ void generateWheelSides()
 		
 		point4 c = wheelSide1Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
 		
-		//vec3 normal = normalize(cross(c-b, a -b));
+		
 
 		wheelSide1Normals[point-3] = vec3(0.0, -1.0, 0.0);//vec3(0.0, 0.0, 1.0); // normal;
 		wheelSide1Normals[point-2] = vec3(0.0, -1.0, 0.0);//vec3(0.0, 0.0, 1.0);;
@@ -1038,9 +1038,7 @@ void generateWheelSides()
 		a = wheelCylinderVers[i+3] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		b = wheelCylinderVers[i+4] = wheelSide2Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		c = wheelCylinderVers[i+5] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
-		//normal = normalize(cross(c - b, a - b));
-
-
+		
 		va = a - point4(0,-1,0,1);
 		vWheelCylinderNormals[i+3] =  vec3(va.x, va.y, va.z); //normal;;
 
