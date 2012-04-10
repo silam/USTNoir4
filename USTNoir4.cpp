@@ -250,10 +250,10 @@ GLuint vPoliceLampSpecularExponent;
 //GLuint vPoliceBlueSpecularColor;
 //GLuint vPoliceBlueSpecularExponent;
 
-vec4* policeLampRedVerts;
-vec3* policeLampRedNormals;
-vec4* policeLampBlueVerts;
-vec3* policeLampBlueNormals;
+//vec4* policeLampRedVerts;
+//vec3* policeLampRedNormals;
+//vec4* policeLampBlueVerts;
+//vec3* policeLampBlueNormals;
 
 
 
@@ -316,7 +316,7 @@ GLuint headrightspot_exponent;
 GLuint headrightspot_direction;
 GLuint headrightspecular_color;
 
-GLuint headrightOn;
+//GLuint headrightOn;
 
 
 GLuint headleftlight_position;
@@ -326,7 +326,6 @@ GLuint headleftambient_light;
 GLuint headleftspot_cutoff;
 GLuint headleftspot_exponent;
 GLuint headleftspot_direction;
-GLuint headleftOn;
 
 //////////////////////////////
 // police light
@@ -1167,8 +1166,7 @@ void setupHeadLight()
 	glUniform4fv(headrightambient_light, 1, vec4(.01, .01, .01, 1));
 	glUniform1f(headrightspot_cutoff, 85);
 	glUniform1f(headrightspot_exponent, 120);
-	glUniform1i(headrightOn, 1);
-
+	
 	// left lamp
 	glUniform4fv(headleftlight_position, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampSource);
 	glUniform4fv(headleftspot_direction, 1, mv*Translate(currentX, 0, currentZ)* RotateY(turnCarAngle)*leftlampDest);
@@ -1179,8 +1177,6 @@ void setupHeadLight()
 	glUniform4fv(headleftambient_light, 1, vec4(.01, .01, .01, 1));
 	glUniform1f(headleftspot_cutoff, 85);
 	glUniform1f(headleftspot_exponent, 120);
-	glUniform1i(headleftOn, 1);
-
 
 }
 //////////////////////////////////////////
@@ -2006,8 +2002,11 @@ void myIdle()
 		}
 	
 		turnPoliceLampAngle += 1;
+		
+		
 	}
 
+	
 	
 	GLint moveF = 1;
 	if ( bmoveForward == true )
@@ -2122,9 +2121,10 @@ void myIdle()
 			}
 		}
 
-		glutPostRedisplay();
+		//glutPostRedisplay();
 	}
 	
+	glutPostRedisplay();
 }
 /////////////////////////////////////////////
 // keyboard
@@ -2342,7 +2342,7 @@ void init() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	  
 	turnPoliceLampAngle = 0;
-	turnOnPoliceLight = false;
+	turnOnPoliceLight = false; // not turn on police light on start
 	startcar = false;
 
 	// preset dollyzoom, lenszoom
