@@ -30,7 +30,7 @@ struct lightSource
 
 uniform lightSource lights[NUM_LIGHTS];
 flat in int lightOn[NUM_LIGHTS];
-vec4 scene_ambient = vec4(0.2, 0.2, 0.2, 1.0);
+vec4 scene_ambient = vec4(0.05, 0.05, 0.05, 1.0);
 
 out vec4  fColor;
 
@@ -59,6 +59,8 @@ void main()
 			
 			vec3 H = normalize(L+E);
 
+			vec4 amb = AmbientDiffuseColor * lights[index].ambient;
+
 			vec4 diff = clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
 
 			vec4 spec = pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
@@ -67,7 +69,9 @@ void main()
 				spec = vec4(0,0,0,1);
 			}
 	
-			final_color +=  diff + spec;
+			// we could add ambient light of the moon here
+			//final_color +=  diff + spec;
+			final_color +=  amb + diff + spec;
 		}
 		else // spot light
 		{
@@ -81,6 +85,8 @@ void main()
 						   					    
 							vec3 H = normalize(L+E);
 
+							vec4 amb = AmbientDiffuseColor * lights[index].ambient;
+
 							vec4 diff = clamp(dot(L,N), 0.0, 1.0) * AmbientDiffuseColor * lights[index].diffuse;
 
 							vec4 spec = pow( clamp (dot(N,H), 0.0, 1.0), SpecularExponent) *  SpecularColor * lights[index].specular;
@@ -89,7 +95,8 @@ void main()
 								spec = vec4(0,0,0,1);
 							}
 	
-							final_color +=  diff + spec;
+							//final_color +=  diff + spec;
+							final_color +=  amb + diff + spec;
 					  }
 			}
 	

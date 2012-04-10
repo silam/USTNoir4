@@ -40,10 +40,7 @@ GLuint chasecamvbo[2];
 int totalchasecamverts;
 vec4 chasecamlookdirection;
 
-
 GLboolean startcar;
-
-
 
 
 ////////////////////////////////
@@ -55,10 +52,10 @@ vec3* policeLightNormals;
 GLuint * policelightvao;
 GLuint * policelightvbo;
 
-GLuint * policeredvao;
-GLuint * policeredvbo;
-GLuint * policebluevao;
-GLuint * policebluevbo;
+//GLuint * policeredvao;
+//GLuint * policeredvbo;
+//GLuint * policebluevao;
+//GLuint * policebluevbo;
 GLfloat turnPoliceLampAngle;
 GLboolean turnOnPoliceLight;
 vec4 policeredlightlampSource;
@@ -73,7 +70,7 @@ GLuint * simpleObjvao;
 GLuint * simpleObjvbo;
 vec4* simpleObjVers;
 vec3* simpleObjNormals;
-GLint totalsimpleobjverts;
+GLint totalobjverts;
 
 
 ////////////////////////////////
@@ -239,13 +236,19 @@ GLuint vSpecularExponent;
 //////////////////////////////
 // police
 /////////////////////////////
-GLuint vPoliceRedAmbientDiffuseColor;
-GLuint vPoliceRedSpecularColor;
-GLuint vPoliceRedSpecularExponent;
 
-GLuint vPoliceBlueAmbientDiffuseColor;
-GLuint vPoliceBlueSpecularColor;
-GLuint vPoliceBlueSpecularExponent;
+GLuint vPoliceLampAmbientDiffuseColor;
+GLuint vPoliceLampSpecularColor;
+GLuint vPoliceLampSpecularExponent;
+
+
+//GLuint vPoliceRedAmbientDiffuseColor;
+//GLuint vPoliceRedSpecularColor;
+//GLuint vPoliceRedSpecularExponent;
+//
+//GLuint vPoliceBlueAmbientDiffuseColor;
+//GLuint vPoliceBlueSpecularColor;
+//GLuint vPoliceBlueSpecularExponent;
 
 vec4* policeLampRedVerts;
 vec3* policeLampRedNormals;
@@ -307,17 +310,19 @@ GLuint moonambient_light;
 //////////////////////////////
 GLuint headrightlight_position;
 GLuint headrightdiffuse_color;
+GLuint headrightambient_light;
 GLuint headrightspot_cutoff;
 GLuint headrightspot_exponent;
 GLuint headrightspot_direction;
 GLuint headrightspecular_color;
+
 GLuint headrightOn;
 
-GLuint headambient_light;
 
 GLuint headleftlight_position;
 GLuint headleftdiffuse_color;
 GLuint headleftspecular_color;
+GLuint headleftambient_light;
 GLuint headleftspot_cutoff;
 GLuint headleftspot_exponent;
 GLuint headleftspot_direction;
@@ -333,7 +338,7 @@ GLuint policeredambient_light;
 GLuint policeredspot_cutoff;
 GLuint policeredspot_exponent;
 GLuint policeredspot_direction;
-GLuint policeRedOn;
+//GLuint policeRedOn;
 
 GLuint policebluelight_position;
 GLuint policebluediffuse_color;
@@ -342,36 +347,36 @@ GLuint policeblueambient_light;
 GLuint policebluespot_cutoff;
 GLuint policebluespot_exponent;
 GLuint policebluespot_direction;
-GLuint policeBlueOn;
+//GLuint policeBlueOn;
 
 //////////////////////////////
 // lightsouce structure
 //////////////////////////////
-struct lightSource
-{
-	vec4 ambient;
-	vec4 position;
-	vec4 diffuse;
-	vec4 specular;
-	float constantAttenuation, linearAttenuation, quadraticAttenuation;
-	float spotCutoff, spotCosCutoff, spotExponent;
-	vec4 spotDirection;
-};
+//struct lightSource
+//{
+//	vec4 ambient;
+//	vec4 position;
+//	vec4 diffuse;
+//	vec4 specular;
+//	float constantAttenuation, linearAttenuation, quadraticAttenuation;
+//	float spotCutoff, spotCosCutoff, spotExponent;
+//	vec4 spotDirection;
+//};
 
-lightSource directionalLight, spotLightHeadLamp;
-const int numberofLightSources = 5;
-lightSource lights[numberofLightSources];
+//lightSource directionalLight, spotLightHeadLamp;
+//const int numberofLightSources = 5;
+//lightSource lights[numberofLightSources];
 
 //////////////////////////////
 // material structure
 //////////////////////////////
-struct material
-{
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
-	float shininess;
-};
+//struct material
+//{
+//	vec4 ambient;
+//	vec4 diffuse;
+//	vec4 specular;
+//	float shininess;
+//};
 
 /////////////////////////////////////////
 //reshape
@@ -424,18 +429,18 @@ void generateSimpleObject()
 
 	float step = (360.0/subdiv)*(M_PI/180.0);
 
-	totalsimpleobjverts = ceil(subdiv/2.0)*subdiv * 6;
+	totalobjverts = ceil(subdiv/2.0)*subdiv * 6;
 
 	if(simpleObjVers){
 		delete[] simpleObjVers;
 	}
 
-	simpleObjVers = new vec4[totalsimpleobjverts];
+	simpleObjVers = new vec4[totalobjverts];
 
 	if(simpleObjNormals){
 		delete[] simpleObjNormals;
 	}
-	simpleObjNormals = new vec3[totalsimpleobjverts];
+	simpleObjNormals = new vec3[totalobjverts];
 
 	int k = 0;
 	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
@@ -483,18 +488,18 @@ void generatePoliceLights()
 
 	float step = (360.0/subdiv)*(M_PI/180.0);
 
-	totalsimpleobjverts = ceil(subdiv/2.0)*subdiv * 6;
+	totalobjverts = ceil(subdiv/2.0)*subdiv * 6;
 
 	if(policeLightVers){
 		delete[] policeLightVers;
 	}
 
-	policeLightVers = new vec4[totalsimpleobjverts];
+	policeLightVers = new vec4[totalobjverts];
 
 	if(policeLightNormals){
 		delete[] policeLightNormals;
 	}
-	policeLightNormals = new vec3[totalsimpleobjverts];
+	policeLightNormals = new vec3[totalobjverts];
 
 	int k = 0;
 	for(float i = -M_PI/2; i<=M_PI/2; i+=step){
@@ -543,9 +548,9 @@ void generateStage(){
 	vec4 c = stageVerts[0] = vec4(-1.0f, -1.0f, 1.0f, 1.0);
 
 	vec3 normals = normalize(cross(a-b, c-b));//cross(a-b,c-b));
-	stageNormals[0] = normals;
-	stageNormals[1] = normals;
-	stageNormals[2] = normals;
+	stageNormals[0] = vec3(0,1,0);
+	stageNormals[1] = vec3(0,1,0);
+	stageNormals[2] = vec3(0,1,0);
 
 
 	vec4 d = stageVerts[5] = vec4(-1.0f, -1.0f, 1.0f, 1.0);
@@ -553,9 +558,9 @@ void generateStage(){
 	vec4 f = stageVerts[3] = vec4(1.0f, -1.0f, -1.0f, 1.0);
 
 	//normals = normalize();//cross(d-e,f-e));
-	stageNormals[3] = normals;
-	stageNormals[4] = normals;
-	stageNormals[5] = normals;
+	stageNormals[3] = vec3(0,1,0);
+	stageNormals[4] = vec3(0,1,0);
+	stageNormals[5] = vec3(0,1,0);
 
 }
 
@@ -619,7 +624,15 @@ void generateHead()
 
 void generateCar(){
 
+
+	if ( carVerts )
+		delete [] carVerts;
+
 	carVerts = new vec4[36];
+
+	if ( carNormals )
+		delete [] carNormals;
+
 	carNormals = new vec3[36];
 
 
@@ -631,22 +644,20 @@ void generateCar(){
 	carVerts[1] = vec4( 0.05f,  0.05f, 0.05f, 1.0);
 	carVerts[2] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
 
-	// calculate normal vectore for car
-	vec3 normal = normalize(cross(carVerts[2] - carVerts[1], carVerts[0] - carVerts[1]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
+	
+	carNormals[index++] = vec3(0,0,1); //normal; 
+	carNormals[index++] = vec3(0,0,1); //normal; 
+	carNormals[index++] = vec3(0,0,1); //normal; 
 
 
 	carVerts[3] = vec4(-0.05f,  0.05f, 0.05f, 1.0);
 	carVerts[4] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 	carVerts[5] = vec4( 0.05f, -0.05f, 0.05f, 1.0);
 	
-	// calculate normal vectore for car
-	//normal = normalize(cross( carVerts[5] - carVerts[4], carVerts[3] - carVerts[4]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
+	
+	carNormals[index++] = vec3(0,0,1); //normal; 
+	carNormals[index++] = vec3(0,0,1); //normal; 
+	carNormals[index++] = vec3(0,0,1); //normal; 
 
 
 	///////////////////
@@ -656,22 +667,19 @@ void generateCar(){
 	carVerts[7] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[8] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 
-
-	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[7] - carVerts[6], carVerts[8] - carVerts[7]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
+		
+	carNormals[index++] = vec3(0,0,-1); //normal; 
+	carNormals[index++] = vec3(0,0,-1);; 
+	carNormals[index++] = vec3(0,0,-1);; 
 
 	carVerts[9] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 	carVerts[10] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	carVerts[11] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
 
-	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[10] - carVerts[9], carVerts[11] - carVerts[10]));
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
-	carNormals[index++] = normal; 
+	
+	carNormals[index++] = vec3(0,0,-1); 
+	carNormals[index++] = vec3(0,0,-1); 
+	carNormals[index++] = vec3(0,0,-1);
 
 		///////////////////
 	// right hand of me
@@ -681,7 +689,7 @@ void generateCar(){
 	carVerts[14] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[13] - carVerts[12], carVerts[14] - carVerts[13]));
+	
 	carNormals[index++] = vec3(1,0,0); //-normal; 
 	carNormals[index++] = vec3(1,0,0);//-normal; 
 	carNormals[index++] = vec3(1,0,0);//-normal; 
@@ -706,7 +714,7 @@ void generateCar(){
 	carVerts[20] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[19] - carVerts[18], carVerts[20] - carVerts[19]));
+	
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
 	carNormals[index++] = vec3(-1,0,0);//-normal; 
@@ -732,7 +740,7 @@ void generateCar(){
 	carVerts[26] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[26] - carVerts[25], carVerts[24] - carVerts[25]));
+	
 	carNormals[index++] = vec3(0,1,0); //normal; 
 	carNormals[index++] = vec3(0,1,0); //normal; 
 	carNormals[index++] = vec3(0,1,0); //normal; 
@@ -742,7 +750,7 @@ void generateCar(){
 	carVerts[29] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[29] - carVerts[28], carVerts[28] - carVerts[27]));
+	
 	carNormals[index++] = vec3(0,1,0); //normal; 
 	carNormals[index++] = vec3(0,1,0); //normal; 
 	carNormals[index++] = vec3(0,1,0); //normal;
@@ -755,7 +763,7 @@ void generateCar(){
 	carVerts[32] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[31] - carVerts[30], carVerts[32] - carVerts[31]));
+	
 	carNormals[index++] = vec3(0,-1,0); //normal; 
 	carNormals[index++] = vec3(0,-1,0);//normal; 
 	carNormals[index++] = vec3(0,-1,0);//normal;
@@ -765,7 +773,7 @@ void generateCar(){
 	carVerts[35] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[34] - carVerts[33], carVerts[35] - carVerts[34]));
+	
 	carNormals[index++] = vec3(0,-1,0);//normal; 
 	carNormals[index++] = vec3(0,-1,0);//normal; 
 	carNormals[index++] = vec3(0,-1,0);//normal;
@@ -779,7 +787,14 @@ void generateCar(){
 
 void generateHeadLightLamps(){
 
+	if ( lampVerts )
+		delete [] lampVerts;
+
 	lampVerts = new vec4[36];
+
+	if ( lampNormals )
+		delete [] lampNormals;
+
 	lampNormals = new vec3[36];
 
 
@@ -818,20 +833,20 @@ void generateHeadLightLamps(){
 
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[7] - carVerts[6], carVerts[8] - carVerts[7]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
+	
+	lampNormals[index++] = vec3(0,0,1); 
+	lampNormals[index++] = vec3(0,0,1); 
+	lampNormals[index++] = vec3(0,0,1); 
 
 	lampVerts[9] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 	lampVerts[10] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	lampVerts[11] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[10] - carVerts[9], carVerts[11] - carVerts[10]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
+	
+	lampNormals[index++] = vec3(0,0,1); 
+	lampNormals[index++] = vec3(0,0,1); 
+	lampNormals[index++] = vec3(0,0,1); 
 
 
 	lampVerts[12] = vec4(0.05f, 0.05f, 0.05f, 1.0);
@@ -840,9 +855,9 @@ void generateHeadLightLamps(){
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[13] - carVerts[12], carVerts[14] - carVerts[13]));
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
+	lampNormals[index++] = vec3(-1,0,0); 
+	lampNormals[index++] = vec3(-1,0,0); 
+	lampNormals[index++] = vec3(-1,0,0);
 
 	lampVerts[15] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	lampVerts[16] = vec4(0.05f, 0.05f, -0.05f, 1.0);
@@ -851,9 +866,9 @@ void generateHeadLightLamps(){
 
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[16] - carVerts[15], carVerts[17] - carVerts[16]));
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
+	lampNormals[index++] = vec3(-1,0,0);
+	lampNormals[index++] = vec3(-1,0,0);
+	lampNormals[index++] = vec3(-1,0,0);
 
 
 	
@@ -863,9 +878,9 @@ void generateHeadLightLamps(){
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[19] - carVerts[18], carVerts[20] - carVerts[19]));
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
+	lampNormals[index++] = vec3(1,0,0); 
+	lampNormals[index++] = vec3(1,0,0); 
+	lampNormals[index++] = vec3(1,0,0); 
 
 
 	lampVerts[21] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
@@ -874,43 +889,43 @@ void generateHeadLightLamps(){
 	
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[22] - carVerts[21], carVerts[23] - carVerts[22]));
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
-	lampNormals[index++] = -normal; 
+	lampNormals[index++] = vec3(1,0,0); 
+	lampNormals[index++] = vec3(1,0,0); 
+	lampNormals[index++] = vec3(1,0,0); 
 
+	// top
 		
 	lampVerts[24] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	lampVerts[25] = vec4(0.05f, 0.05f, -0.05f, 1.0);
 	lampVerts[26] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 
 	// calculate normal vectore for car
-	normal = normalize(cross(carVerts[26] - carVerts[25], carVerts[24] - carVerts[25]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
+	
+	lampNormals[index++] = vec3(0,1,0); 
+	lampNormals[index++] = vec3(0,1,0); 
+	lampNormals[index++] = vec3(0,1,0); 
 
 	lampVerts[27] = vec4(-0.05f, 0.05f, -0.05f, 1.0);
 	lampVerts[28] = vec4(-0.05f, 0.05f, 0.05f, 1.0);
 	lampVerts[29] = vec4(0.05f, 0.05f, 0.05f, 1.0);
 	
 	// calculate normal vectore for car
-	// normal = normalize(cross(carVerts[29] - carVerts[28], carVerts[28] - carVerts[27]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal;
+	
+	lampNormals[index++] = vec3(0,1,0); 
+	lampNormals[index++] = vec3(0,1,0); 
+	lampNormals[index++] = vec3(0,1,0);
 
-	//for(int i=30; i<36; i++){
-	//	carColors[i] = vec4(0.0, 1.0, 0.0, 1.0); //bottom
-	//}
+
+	// bottom
 	lampVerts[30] = vec4(0.05f, -0.05f, -0.05f, 1.0);
 	lampVerts[31] = vec4(0.05f, -0.05f, 0.05f, 1.0);
 	lampVerts[32] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 
 	// calculate normal vectore for car
 	normal = normalize(cross(carVerts[31] - carVerts[30], carVerts[32] - carVerts[31]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal;
+	lampNormals[index++] = vec3(0,-1,0); 
+	lampNormals[index++] = vec3(0,-1,0); 
+	lampNormals[index++] = vec3(0,-1,0);
 
 	lampVerts[33] = vec4(-0.05f, -0.05f, 0.05f, 1.0);
 	lampVerts[34] = vec4(-0.05f, -0.05f, -0.05f, 1.0);
@@ -918,9 +933,9 @@ void generateHeadLightLamps(){
 
 	// calculate normal vectore for car
 	// normal = normalize(cross(carVerts[34] - carVerts[33], carVerts[35] - carVerts[34]));
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal; 
-	lampNormals[index++] = normal;
+	lampNormals[index++] = vec3(0,-1,0); 
+	lampNormals[index++] = vec3(0,-1,0); 
+	lampNormals[index++] = vec3(0,-1,0);
 	
 }
 
@@ -931,11 +946,31 @@ void generateHeadLightLamps(){
 /////////////////////////////////////////
 void generateWheelSides()
 {
+	if ( wheelSide1Verts )
+		delete [] wheelSide1Verts;
+
 	wheelSide1Verts  = new vec4[75];
+
+	if ( wheelSide2Verts )
+		delete [] wheelSide2Verts;
+
+	if ( wheelSide1Normals )
+		delete [] wheelSide1Normals;
+
+	if ( wheelSide2Normals )
+		delete [] wheelSide2Normals;
+
 	wheelSide1Normals  = new vec3[75];
 
 	wheelSide2Verts  = new vec4[75];
 	wheelSide2Normals  = new vec3[75];
+
+
+	if ( wheelCylinderVers )
+		delete [] wheelCylinderVers;
+
+	if ( vWheelCylinderNormals )
+		delete [] vWheelCylinderNormals;
 
 	wheelCylinderVers  = new vec4[414];
 	vWheelCylinderNormals  = new vec3[414];
@@ -973,7 +1008,6 @@ void generateWheelSides()
 		
 		point4 c = wheelSide2Verts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), side*(-1.0f), -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
 		
-		//vec3 normal = normalize(cross(c-b, a -b));
 
 		wheelSide2Normals[point-3] = vec3(0.0, 1.0, 0.0);//vec3(0.0, 0.0, -1.0);;
 		wheelSide2Normals[point-2] = vec3(0.0, 1.0, 0.0);//vec3(0.0, 0.0, -1.0);;
@@ -991,7 +1025,6 @@ void generateWheelSides()
 		point4 b = wheelCylinderVers[i+1] = wheelSide1Verts[(p+2)%3==0?(p+2+1+1):(p+2)];
 		point4 c = wheelCylinderVers[i+2] = wheelSide2Verts[(p+1)%3==0?(p+1+1+1):(p+1)];
 
-		//vec3 normal = normalize(cross(c - b, a - b));
 
 		point4 va = a - point4(0,-1,0,1);
 		vWheelCylinderNormals[i]   =  vec3(va.x, va.y, va.z); //normal;
@@ -1038,54 +1071,57 @@ void DrawTriagle(GLuint vao[], int count)
 /////////////////////////////////////////
 //generatePoliceLamp
 /////////////////////////////////////////
-void generatePoliceLamp()
-{
-		
-	policeLampRedVerts = new vec4[144];
-	policeLampRedNormals = new vec3[144];
-
-	policeLampBlueVerts = new vec4[144];
-	policeLampBlueNormals = new vec3[144];
-
-	int point = 0;
-	double angleincrement = 15;
-	for ( double angle = 0; angle <= 360; angle += angleincrement)
-	{
-		
-		point4 a = policeLampRedVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
-		
-		point4 b = policeLampRedVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
-				
-		point4 c = policeLampRedVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
-		
-		//vec3 normal = normalize(cross(c-b, a -b));
-
-		policeLampRedNormals[point-3] = vec3(0.0, 0.0, -1.0);
-		policeLampRedNormals[point-2] = vec3(0.0, 0.0, -1.0);
-		policeLampRedNormals[point-1] = vec3(0.0, 0.0, -1.0);
-	}
-
-	
-	 point = 0;
-	 angleincrement = 15;
-
-	for ( double angle = 0; angle <= 360; angle += angleincrement)
-	{
-	
-		point4 a = policeLampBlueVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
-		point4 b = policeLampBlueVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
-		point4 c = policeLampBlueVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
-		
-		//vec3 normal = normalize(cross(c-b, a -b));
-
-		policeLampBlueNormals[point-3] = vec3(0.0, 0.0, 1.0);
-		policeLampBlueNormals[point-2] = vec3(0.0, 0.0, 1.0);
-		policeLampBlueNormals[point-1] = vec3(0.0, 0.0, 1.0);
-	}
-
-	
-
-}
+//void generatePoliceLamp()
+//{
+//		
+//	if ( carVerts )
+//		delete [] carVerts;
+//
+//	policeLampRedVerts = new vec4[144];
+//	policeLampRedNormals = new vec3[144];
+//
+//	policeLampBlueVerts = new vec4[144];
+//	policeLampBlueNormals = new vec3[144];
+//
+//	int point = 0;
+//	double angleincrement = 15;
+//	for ( double angle = 0; angle <= 360; angle += angleincrement)
+//	{
+//		
+//		point4 a = policeLampRedVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
+//		
+//		point4 b = policeLampRedVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
+//				
+//		point4 c = policeLampRedVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+//		
+//		//vec3 normal = normalize(cross(c-b, a -b));
+//
+//		policeLampRedNormals[point-3] = vec3(0.0, 0.0, -1.0);
+//		policeLampRedNormals[point-2] = vec3(0.0, 0.0, -1.0);
+//		policeLampRedNormals[point-1] = vec3(0.0, 0.0, -1.0);
+//	}
+//
+//	
+//	 point = 0;
+//	 angleincrement = 15;
+//
+//	for ( double angle = 0; angle <= 360; angle += angleincrement)
+//	{
+//	
+//		point4 a = policeLampBlueVerts[point++] = vec4(0.0f,	0.0f, 0.0f, 1.0); //point 1
+//		point4 b = policeLampBlueVerts[point++] = vec4(cos(angle*M_PI/180), 0.0f, -sin(angle*M_PI/180), 1.0); //point 2
+//		point4 c = policeLampBlueVerts[point++] = vec4(cos((angle+angleincrement)*M_PI/180), 0.0f, -sin((angle+angleincrement)*M_PI/180), 1.0); //point 3
+//		
+//		//vec3 normal = normalize(cross(c-b, a -b));
+//
+//		policeLampBlueNormals[point-3] = vec3(0.0, 0.0, 1.0);
+//		policeLampBlueNormals[point-2] = vec3(0.0, 0.0, 1.0);
+//		policeLampBlueNormals[point-1] = vec3(0.0, 0.0, 1.0);
+//	}
+//
+//	
+//
+//}
 
 //////////////////////////////////////////
 // setupPoliceLight
@@ -1098,7 +1134,7 @@ void setupPoliceLight()
 		
 	glUniform4fv(policereddiffuse_color,  1, vec4(1.0f, 0.0f,0.0f,1));
 	glUniform4fv(policeredspecular_color, 1, vec4(1.0f,1.0f,1.0f,1));
-	glUniform4fv(policeredambient_light,  1, vec4(0.2, 0.2, 0.2, 1));
+	glUniform4fv(policeredambient_light,  1, vec4(0.01, 0.01, 0.01, 1));
 
 	glUniform1f(policeredspot_cutoff, 45);
 	glUniform1f(policeredspot_exponent, 120);
@@ -1111,11 +1147,11 @@ void setupPoliceLight()
 		
 	glUniform4fv(policebluediffuse_color,  1, vec4(0.0f,0.0f,1.0f,1));
 	glUniform4fv(policebluespecular_color, 1, vec4(0.0f,0.0f,1.0f,1));
-	glUniform4fv(policeblueambient_light,  1, vec4(.2, .2, .2, 1));
+	glUniform4fv(policeblueambient_light,  1, vec4(.01, .01, .01, 1));
 
 	glUniform1f(policebluespot_cutoff, 45);
 	glUniform1f(policebluespot_exponent, 120);
-	glUniform1i(policeBlueOn, 1);
+	
 	
 }
 //////////////////////////////////////////
@@ -1130,7 +1166,7 @@ void setupHeadLight()
 
 	glUniform4fv(headrightdiffuse_color, 1, vec4(1.0,1.0f,1.0f,1));
 	glUniform4fv(headrightspecular_color, 1, vec4(1.0,1.0f,1.0f,1));
-	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+	glUniform4fv(headrightambient_light, 1, vec4(.01, .01, .01, 1));
 	glUniform1f(headrightspot_cutoff, 85);
 	glUniform1f(headrightspot_exponent, 120);
 	glUniform1i(headrightOn, 1);
@@ -1142,7 +1178,7 @@ void setupHeadLight()
 
 	glUniform4fv(headleftdiffuse_color, 1, vec4(1.0f,1.0f,1.0f,1));
 	glUniform4fv(headleftspecular_color, 1, vec4(1.0,1.0f,1.0f,1));
-	glUniform4fv(headambient_light, 1, vec4(.2, .2, .2, 1));
+	glUniform4fv(headleftambient_light, 1, vec4(.01, .01, .01, 1));
 	glUniform1f(headleftspot_cutoff, 85);
 	glUniform1f(headleftspot_exponent, 120);
 	glUniform1i(headleftOn, 1);
@@ -1155,9 +1191,9 @@ void setupHeadLight()
 void setupMoonLight()
 {
 	glUniform4fv(moonlight_position, 1, mv*vec4(100, 100, 100, 0)); //1));
-	glUniform4fv(moondiffuse_color, 1, vec4(0.8,.8f,.4f,1));
+	glUniform4fv(moondiffuse_color, 1, vec4(0.4,.4f,.4f,1));
 	glUniform4fv(moonspecular_color, 1, vec4(0.4,.4f,.4f,1));
-	glUniform4fv(moonambient_light, 1, vec4(.2, .2, .2, 1));
+	glUniform4fv(moonambient_light, 1, vec4(.01, .01, .01, 1));
 		
 }
 /////////////////////////////////////////
@@ -1193,11 +1229,11 @@ void displayPoliceLights()
 	mv = mv * Translate(0.0, -0.83, -0.08); // 0.05
 	mv = mv * Scale(0.02,0.05,0.02);
 	
-	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1, 1.0, 1.0, 1));
-	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
-	glVertexAttrib1f(vPoliceRedSpecularExponent, 10.0);
+	glVertexAttrib4fv(vPoliceLampAmbientDiffuseColor, vec4(0.3, 0.1, 0.3, 1));
+	glVertexAttrib4fv(vPoliceLampSpecularColor, vec4(1.f,1.f,1.f,1.0f));
+	glVertexAttrib1f(vPoliceLampSpecularExponent, 10.0);
 
-	DrawTriagle(policelightvao, totalsimpleobjverts);
+	DrawTriagle(policelightvao, totalobjverts);
 
 	mv = stack.pop();
 
@@ -1206,26 +1242,26 @@ void displayPoliceLights()
 /////////////////////////////////////////
 // displayHeadLights
 /////////////////////////////////////////
-void displayHeadLights()
-{
-	
-	stack.push(mv);
-	
-	mv = mv * Translate(currentX, 0, currentZ);
-	mv = mv * RotateY(turnCarAngle);
-
-	mv = mv * Translate(0.0, -0.95, 0.10); // 0.05
-	mv = mv * Scale(0.05,0.08,0.04);
-	
-	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1, 1.0, 1.0, 1));
-	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
-	glVertexAttrib1f(vPoliceRedSpecularExponent, 10.0);
-
-	DrawTriagle(policeredvao, totalsimpleobjverts);
-
-	mv = stack.pop();
-
-}
+//void displayHeadLights()
+//{
+//	
+//	stack.push(mv);
+//	
+//	mv = mv * Translate(currentX, 0, currentZ);
+//	mv = mv * RotateY(turnCarAngle);
+//
+//	mv = mv * Translate(0.0, -0.95, 0.10); // 0.05
+//	mv = mv * Scale(0.05,0.08,0.04);
+//	
+//	glVertexAttrib4fv(vPoliceLampAmbientDiffuseColor, vec4(1, 1.0, 1.0, 1));
+//	glVertexAttrib4fv(vPoliceLampSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
+//	glVertexAttrib1f(vPoliceLampSpecularExponent, 10.0);
+//
+//	DrawTriagle(policeredvao, totalsimpleobjverts);
+//
+//	mv = stack.pop();
+//
+//}
 /////////////////////////////////////////
 // displaySimpleObj
 /////////////////////////////////////////
@@ -1241,7 +1277,7 @@ void displaySimpleObj()
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
-	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+	DrawTriagle(simpleObjvao, totalobjverts);
 
 	mv = stack.pop();
 
@@ -1256,7 +1292,7 @@ void displaySimpleObj()
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
-	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+	DrawTriagle(simpleObjvao, totalobjverts);
 
 	mv = stack.pop();
 
@@ -1271,7 +1307,7 @@ void displaySimpleObj()
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
-	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+	DrawTriagle(simpleObjvao, totalobjverts);
 
 	mv = stack.pop();
 
@@ -1286,7 +1322,7 @@ void displaySimpleObj()
 	glVertexAttrib4fv(vSimpleObjSpecularColor, vec4(0.4f,0.4f,0.4f,1.0f));
 	glVertexAttrib1f(vSimpleObjSpecularExponent, 10.0);
 
-	DrawTriagle(simpleObjvao, totalsimpleobjverts);
+	DrawTriagle(simpleObjvao, totalobjverts);
 
 	mv = stack.pop();
 		
@@ -1361,9 +1397,6 @@ void displayHead()
 	DrawTriagle(headvao, totalheadverts);
 
 	mv = stack.pop();
-
-	// left police head lamp
-
 
 
 }
@@ -1572,62 +1605,62 @@ void displayWheels()
 
 
 }
-//////////////////////////////////////////
-// police lamp
-//////////////////////////////////////////
-	
-void displayPoliceLamps()
-{
-	
-	if ( turnOnPoliceLight == true )
-		glVertexAttrib4fv(vPoliceIsOn, lightOn);
-	else
-		glVertexAttrib4fv(vPoliceIsOn, lightOff);
-
-	// left lamp
-	stack.push(mv);
-	
-	mv = mv * Translate(currentX, 0, currentZ);
-	mv = mv * RotateY(turnCarAngle);
-	mv = mv * Translate(0.015, -0.84, -0.07); // -0.905
-	mv = mv * RotateY(turnPoliceLampAngle);
-	mv = mv * RotateX(-90);
-	mv = mv * Scale(0.010f,0.040f,0.040f);
-
-	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-
-	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1.0f, 0.0f, 0.0f, 1));
-	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f, 0.0f,0.0f,1.0f));
-	glVertexAttrib1f(vPoliceRedSpecularExponent, 1.0);
-		
-
-	DrawTriagle(policeredvao, 144);
-
-	mv = stack.pop();
-
-	// Blue lamp
-	stack.push(mv);
-	
-	mv = mv * Translate(currentX, 0, currentZ);
-	mv = mv * RotateY(turnCarAngle);
-
-	
-	mv = mv * Translate(-0.015, -0.84, -0.07); // -0.905
-	
-	mv = mv * RotateY(turnPoliceLampAngle);
-	mv = mv * RotateX(-90);
-	mv = mv * Scale(0.010f,0.040f,0.040f);
-
-	glVertexAttrib4fv(vPoliceBlueAmbientDiffuseColor, vec4(0.0f, 0.0f, 1.0f, 1));
-	glVertexAttrib4fv(vPoliceBlueSpecularColor, vec4(0.0f, 0.0f,1.0f,1.0f));
-	glVertexAttrib1f(vPoliceBlueSpecularExponent, 1.0);
-
-
-	DrawTriagle(policebluevao, 144);
-
-	mv = stack.pop();
-
-}
+////////////////////////////////////////////
+//// police lamp
+////////////////////////////////////////////
+//	
+//void displayPoliceLamps()
+//{
+//	
+//	if ( turnOnPoliceLight == true )
+//		glVertexAttrib4fv(vPoliceIsOn, lightOn);
+//	else
+//		glVertexAttrib4fv(vPoliceIsOn, lightOff);
+//
+//	// left lamp
+//	stack.push(mv);
+//	
+//	mv = mv * Translate(currentX, 0, currentZ);
+//	mv = mv * RotateY(turnCarAngle);
+//	mv = mv * Translate(0.015, -0.84, -0.07); // -0.905
+//	mv = mv * RotateY(turnPoliceLampAngle);
+//	mv = mv * RotateX(-90);
+//	mv = mv * Scale(0.010f,0.040f,0.040f);
+//
+//	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+//
+//	glVertexAttrib4fv(vPoliceRedAmbientDiffuseColor, vec4(1.0f, 0.0f, 0.0f, 1));
+//	glVertexAttrib4fv(vPoliceRedSpecularColor, vec4(0.4f, 0.0f,0.0f,1.0f));
+//	glVertexAttrib1f(vPoliceRedSpecularExponent, 1.0);
+//		
+//
+//	DrawTriagle(policeredvao, 144);
+//
+//	mv = stack.pop();
+//
+//	// Blue lamp
+//	stack.push(mv);
+//	
+//	mv = mv * Translate(currentX, 0, currentZ);
+//	mv = mv * RotateY(turnCarAngle);
+//
+//	
+//	mv = mv * Translate(-0.015, -0.84, -0.07); // -0.905
+//	
+//	mv = mv * RotateY(turnPoliceLampAngle);
+//	mv = mv * RotateX(-90);
+//	mv = mv * Scale(0.010f,0.040f,0.040f);
+//
+//	glVertexAttrib4fv(vPoliceBlueAmbientDiffuseColor, vec4(0.0f, 0.0f, 1.0f, 1));
+//	glVertexAttrib4fv(vPoliceBlueSpecularColor, vec4(0.0f, 0.0f,1.0f,1.0f));
+//	glVertexAttrib1f(vPoliceBlueSpecularExponent, 1.0);
+//
+//
+//	DrawTriagle(policebluevao, 144);
+//
+//	mv = stack.pop();
+//
+//}
 
 void display(void)
 {
@@ -1682,7 +1715,6 @@ void display(void)
 	setupMoonLight();
 	setupHeadLight();
 	setupPoliceLight();
-		
 
 	displayStage();
 	displaySimpleObj();
@@ -1690,9 +1722,7 @@ void display(void)
 	displayHeadLightLamps();
 	displayHead();
 	displayEye();
-	//displayPoliceLamps();
 	displayPoliceLights();
-	// will come back to look at : displayHeadLights();
 	displayWheels();
 		
     glFlush();
@@ -1710,7 +1740,7 @@ void setupShader(GLuint prog){
 
 	model_view = glGetUniformLocation(prog, "model_view");
 	projection = glGetUniformLocation(prog, "projection");
-	
+	 
 	
 	///////////////////////////////////////////////////
 	// setup moonlight
@@ -1718,7 +1748,7 @@ void setupShader(GLuint prog){
 	moonlight_position	= glGetUniformLocation(prog, "lights[0].position");
 	moondiffuse_color	= glGetUniformLocation(prog, "lights[0].diffuse");
 	moonspecular_color	= glGetUniformLocation(prog, "lights[0].specular");
-	moonambient_light	= glGetUniformLocation(prog, "ambient_light");
+	moonambient_light	= glGetUniformLocation(prog, "lights[0].ambient");
 
 	///////////////////////////////////////////////////
 	//setup right headlight
@@ -1726,7 +1756,7 @@ void setupShader(GLuint prog){
 	headrightlight_position		= glGetUniformLocation(prog, "lights[1].position");
 	headrightdiffuse_color		= glGetUniformLocation(prog, "lights[1].diffuse");
 	headrightspecular_color		= glGetUniformLocation(prog, "lights[1].specular");
-	headambient_light			= glGetUniformLocation(prog, "ambient_light");
+	headrightambient_light		= glGetUniformLocation(prog, "lights[1].ambient");
 	headrightspot_direction		= glGetUniformLocation(prog, "lights[1].spot_direction");
 	headrightspot_cutoff		= glGetUniformLocation(prog, "lights[1].spot_cutoff");
 	headrightspot_exponent		= glGetUniformLocation(prog, "lights[1].spot_exponent");
@@ -1738,7 +1768,7 @@ void setupShader(GLuint prog){
 	headleftlight_position	= glGetUniformLocation(prog, "lights[2].position");
 	headleftdiffuse_color		= glGetUniformLocation(prog, "lights[2].diffuse");
 	headleftspecular_color		= glGetUniformLocation(prog, "lights[2].specular");
-	headambient_light		= glGetUniformLocation(prog, "ambient_light");
+	headleftambient_light		= glGetUniformLocation(prog, "lights[2].ambient");
 	headleftspot_direction	= glGetUniformLocation(prog, "lights[2].spot_direction");
 	headleftspot_cutoff			= glGetUniformLocation(prog, "lights[2].spot_cutoff");
 	headleftspot_exponent		= glGetUniformLocation(prog, "lights[2].spot_exponent");
@@ -1750,7 +1780,7 @@ void setupShader(GLuint prog){
 	policeredlight_position = glGetUniformLocation(prog, "lights[3].position");
 	policereddiffuse_color  = glGetUniformLocation(prog, "lights[3].diffuse");
 	policeredspecular_color = glGetUniformLocation(prog, "lights[3].specular");
-	policeredambient_light  = glGetUniformLocation(prog, "ambient_light");
+	policeredambient_light  = glGetUniformLocation(prog, "lights[3].ambient");
 	policeredspot_direction = glGetUniformLocation(prog, "lights[3].spot_direction");
 	policeredspot_cutoff    = glGetUniformLocation(prog, "lights[3].spot_cutoff");
 	policeredspot_exponent  = glGetUniformLocation(prog, "lights[3].spot_exponent");
@@ -1761,7 +1791,7 @@ void setupShader(GLuint prog){
 	policebluelight_position	= glGetUniformLocation(prog, "lights[4].position");
 	policebluediffuse_color		= glGetUniformLocation(prog, "lights[4].diffuse");
 	policebluespecular_color	= glGetUniformLocation(prog, "lights[4].specular");
-	policeredambient_light		= glGetUniformLocation(prog, "ambient_light");
+	policeblueambient_light		= glGetUniformLocation(prog, "lights[4].ambient");
 	policebluespot_direction	= glGetUniformLocation(prog, "lights[4].spot_direction");
 	policebluespot_cutoff		= glGetUniformLocation(prog, "lights[4].spot_cutoff");
 	policebluespot_exponent		= glGetUniformLocation(prog, "lights[4].spot_exponent");
@@ -1823,7 +1853,7 @@ void setupSimpleObjShader(GLuint prog)
 
 	simpleObjvao = new GLuint[1];
 	simpleObjvbo = new GLuint[2];
-	setupShader(prog, simpleObjvao, simpleObjvbo, simpleObjVers, simpleObjNormals, totalsimpleobjverts);
+	setupShader(prog, simpleObjvao, simpleObjvbo, simpleObjVers, simpleObjNormals, totalobjverts);
 
 
 }
@@ -1837,11 +1867,9 @@ void setupCarShader(GLuint prog)
 	vCarSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
 	vCarSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 
-
 	carvao = new GLuint[1];
 	carvbo = new GLuint[2];
 	setupShader(prog, carvao, carvbo, carVerts, carNormals, 36);
-
 
 }
 
@@ -1865,61 +1893,49 @@ void setupHeadLightLampsShader(GLuint prog)
 //////////////////////////////////////////////////
 void setupPoliceLightsShader(GLuint prog)
 {
-	vPoliceRedAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vPoliceRedSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vPoliceRedSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+	vPoliceLampAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vPoliceLampSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vPoliceLampSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
 	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
 
 
 	policelightvao = new GLuint[1];
 	policelightvbo = new GLuint[2];
 	setupShader(prog, policelightvao, policelightvbo, policeLightVers, policeLightNormals, totalheadverts);
-		
-
-	// blue
-	/*vPoliceBlueAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vPoliceBlueSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vPoliceBlueSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
-	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
-
-
-	policebluevao = new GLuint[1];
-	policebluevbo = new GLuint[2];
-	setupShader(prog, policebluevao, policebluevbo, policeLampBlueVerts, policeLampBlueNormals, 144);
-*/
+	
 
 }
 
 ///////////////////////////////////////////////////
 // setupPoliceLightShader
 //////////////////////////////////////////////////
-void setupPoliceLightShader(GLuint prog)
-{
-	vPoliceRedAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vPoliceRedSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vPoliceRedSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
-	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
-
-
-	policeredvao = new GLuint[1];
-	policeredvbo = new GLuint[2];
-	setupShader(prog, policeredvao, policeredvbo, policeLampRedVerts, policeLampRedNormals, 144);
-
-	
-
-	// blue
-	vPoliceBlueAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
-	vPoliceBlueSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
-	vPoliceBlueSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
-	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
-
-
-	policebluevao = new GLuint[1];
-	policebluevbo = new GLuint[2];
-	setupShader(prog, policebluevao, policebluevbo, policeLampBlueVerts, policeLampBlueNormals, 144);
-
-
-}
+//void setupPoliceLightShader(GLuint prog)
+//{
+//	vPoliceRedAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+//	vPoliceRedSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+//	vPoliceRedSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+//	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
+//
+//
+//	policeredvao = new GLuint[1];
+//	policeredvbo = new GLuint[2];
+//	setupShader(prog, policeredvao, policeredvbo, policeLampRedVerts, policeLampRedNormals, 144);
+//
+//	
+//
+//	// blue
+//	vPoliceBlueAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+//	vPoliceBlueSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+//	vPoliceBlueSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+//	vPoliceIsOn =  glGetAttribLocation(prog, "vIsOn");
+//
+//
+//	policebluevao = new GLuint[1];
+//	policebluevbo = new GLuint[2];
+//	setupShader(prog, policebluevao, policebluevbo, policeLampBlueVerts, policeLampBlueNormals, 144);
+//
+//
+//}
 
 ///////////////////////////////////////////////////
 // setupEyeShader
@@ -1961,8 +1977,6 @@ void setupWheelShader(GLuint prog)
 	cylindervao = new GLuint[1];
 	cylindervbo = new GLuint[2];
 	setupShader(prog, cylindervao, cylindervbo, wheelCylinderVers, vWheelCylinderNormals, 414);
-
-		
 
 }
 
@@ -2162,14 +2176,14 @@ void Keyboard(unsigned char key, int x, int y) {
 		{
 			currentlenszoom = lenszoom;
 			
-			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(lenszoom, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 1;
 		}
 		else if ( switchcamera == 1 )
 		{
 			currentlenszoom = lenszoom;
 			
-			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
+			p = Perspective(lenszoom, (float)ww/(float)wh, 1.0, 100.0);
 			switchcamera = 2;
 		}
 		else if ( switchcamera == 2 )
@@ -2199,8 +2213,9 @@ void Keyboard(unsigned char key, int x, int y) {
 			lenszoom += 1;
 			reshape(ww, wh);
 		}
-		else
+		else{
 			p = Perspective(1.0, (float)ww/(float)wh, 1.0, 100.0);
+		}
 			
 	}
 	else if (key == 'a' || key == 'A' ) // to zoom in
@@ -2332,6 +2347,7 @@ void init() {
 	turnOnPoliceLight = false;
 	startcar = false;
 
+	// preset dollyzoom, lenszoom
 	  atX = atZ = 0;
 	  dollyzoom = 3.0f;
 	  lenszoom = 25.0;
@@ -2387,7 +2403,6 @@ void init() {
 	generateHeadLightLamps();
 	generateHead();
 	generateEyes();
-	//generatePoliceLamp();
 	generatePoliceLights();
 	generateWheelSides();
 
@@ -2402,7 +2417,6 @@ void init() {
 	setupHeadLightLampsShader(program);
 	setupHeadShader(program);
 	setupEyeShader(program);
-	//setupPoliceLightShader(program);
 	setupPoliceLightsShader(program);
 	setupWheelShader(program);
 
@@ -2505,6 +2519,9 @@ void special(int key, int x, int y){
 	//don't forget to request a new frame since parameters have changed
 	glutPostRedisplay();
 }
+/////////////////////////////////
+// main
+/////////////////////////////////
 int main(int argc, char **argv)
 {
 	  /*set up window for display*/
